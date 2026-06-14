@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>numo GROUP · مستقبل التعلّم الإلكتروني في المملكة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f4fc;
+  --card:#ffffff;
+  --plum:#4774D0;
+  --plum-strong:#2A5BC8;
+  --plum-dark:#1D44A0;
+  --plum-tint:#E5EDFB;
+  --ink:#352f3d;
+  --text:#4c4856;
+  --muted:#8b8794;
+  --line:#ece9f2;
+  --field-border:#e6e2ee;
+  --shadow-card:0 30px 70px -30px rgba(30,68,160,.28), 0 8px 24px -16px rgba(30,68,160,.18);
+  --shadow-soft:0 18px 44px -28px rgba(30,68,160,.30);
+  --radius-card:26px;
+  --radius-sm:14px;
+  --font-ar:"Cairo",system-ui,sans-serif;
+  --font-en:"Plus Jakarta Sans",system-ui,sans-serif;
+  --maxw:1466px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ar);-webkit-font-smoothing:antialiased;line-height:1.6}
+html[data-lang="en"] body{font-family:var(--font-en)}
+img{max-width:100%;display:block}
+a{text-decoration:none;color:inherit}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 40px}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:13.5px;font-weight:700;color:var(--plum);letter-spacing:.3px;background:var(--plum-tint);padding:8px 15px;border-radius:999px;margin-bottom:20px}
+.eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--plum)}
+.section-head{max-width:760px;margin:0 auto 54px;text-align:center}
+.section-head h2{font-size:38px;font-weight:800;color:#352f3d;line-height:1.3;letter-spacing:-.3px;text-wrap:balance}
+.section-head p{margin-top:16px;font-size:17px;color:var(--muted);font-weight:500}
+
+/* ========== announcement bar ========== */
+.announce{background:linear-gradient(135deg,var(--plum-strong) 0%,#16357A 100%);color:#fff;position:relative;overflow:hidden}
+.announce::before{content:"";position:absolute;inset-inline-end:-80px;top:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.10),transparent 65%)}
+.announce__in{max-width:var(--maxw);margin:0 auto;padding:13px 40px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;position:relative;z-index:1}
+.announce__chip{background:rgba(255,255,255,.18);color:#fff;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:5px 11px;border-radius:6px;text-transform:uppercase}
+.announce__msg{font-size:14.5px;font-weight:600;flex:1;color:rgba(255,255,255,.95);min-width:200px}
+.announce__link{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:700;color:#fff;background:rgba(255,255,255,.12);padding:8px 16px;border-radius:8px;transition:.18s}
+.announce__link:hover{background:rgba(255,255,255,.22);gap:11px}
+.announce__link svg{width:14px;height:14px}
+html[dir="rtl"] .announce__link svg{transform:scaleX(-1)}
+
+/* ========== nav ========== */
+.nav{position:sticky;top:0;z-index:50;background:rgba(245,244,252,.86);backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid rgba(236,233,242,.9)}
+.nav__in{max-width:var(--maxw);margin:0 auto;padding:15px 40px;display:flex;align-items:center;gap:30px}
+.nav__logo img{height:42px;width:auto}
+.nav__links{display:flex;align-items:center;gap:30px;margin-inline-start:18px}
+.nav__links a{font-size:15px;font-weight:600;color:#534e5e;transition:.16s;position:relative}
+.nav__links a:hover{color:var(--plum)}
+.nav__links a::after{content:"";position:absolute;inset-inline-start:0;bottom:-6px;height:2px;width:0;background:var(--plum);transition:.2s;border-radius:2px}
+.nav__links a:hover::after{width:100%}
+.nav__right{margin-inline-start:auto;display:flex;align-items:center;gap:14px}
+.lang-toggle{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 15px;font-family:var(--font-ar);font-size:14px;font-weight:600;color:#5a5663;cursor:pointer;transition:.18s}
+html[data-lang="en"] .lang-toggle{font-family:var(--font-en)}
+.lang-toggle:hover{border-color:#a8c0ee;color:var(--plum);box-shadow:0 4px 14px -6px rgba(50,100,200,.35)}
+.lang-toggle svg.globe{width:16px;height:16px}
+
+/* ========== buttons ========== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;font-family:inherit;font-weight:700;border-radius:12px;transition:.18s;border:1.5px solid transparent;white-space:nowrap}
+.btn svg{width:18px;height:18px;flex:none}
+html[dir="rtl"] .btn svg.arrow{transform:scaleX(-1)}
+.btn--sm{height:44px;padding:0 20px;font-size:14.5px}
+.btn--md{height:54px;padding:0 28px;font-size:16px}
+.btn--xs{height:38px;padding:0 16px;font-size:13.5px;border-radius:10px}
+.btn--primary{background:var(--plum-strong);color:#fff;box-shadow:0 14px 28px -14px rgba(42,91,200,.7)}
+.btn--primary:hover{background:var(--plum-dark);transform:translateY(-1px);box-shadow:0 18px 32px -14px rgba(42,91,200,.8)}
+.btn--ghost{background:#fff;color:#4a4654;border-color:var(--field-border)}
+.btn--ghost:hover{border-color:#a8c0ee;color:var(--plum);background:#fafcff}
+.btn--white{background:#fff;color:var(--plum-strong)}
+.btn--white:hover{transform:translateY(-1px);box-shadow:0 18px 32px -16px rgba(0,0,0,.3)}
+.btn--link{height:auto;padding:0;background:transparent;color:var(--plum-strong);border:none;font-weight:700;font-size:14.5px}
+.btn--link:hover{color:var(--plum-dark);gap:11px}
+
+/* ========== hero ========== */
+.hero{padding:60px 0 24px}
+.hero__grid{display:grid;grid-template-columns:1.08fr .92fr;gap:60px;align-items:center}
+.hero h1{font-size:54px;line-height:1.18;font-weight:800;color:#312b39;letter-spacing:-.5px;text-wrap:balance}
+.hero h1 .accent{background:linear-gradient(180deg,transparent 64%,rgba(50,100,200,.20) 64%,rgba(50,100,200,.20) 92%,transparent 92%);padding:0 2px}
+.hero h1 .plum{color:var(--plum-strong)}
+.hero__lede{margin-top:24px;font-size:18.5px;line-height:1.85;color:#5d5866;font-weight:500;max-width:30em}
+.hero__cta{margin-top:34px;display:flex;gap:14px;flex-wrap:wrap}
+.hero__media{position:relative}
+.hero__photo{border-radius:var(--radius-card);overflow:hidden;box-shadow:var(--shadow-card);aspect-ratio:4/4.4;background:var(--plum-tint)}
+.hero__photo img{width:100%;height:100%;object-fit:cover}
+.hero__badge{position:absolute;inset-inline-start:-22px;bottom:36px;background:#fff;border-radius:18px;padding:16px 20px;box-shadow:var(--shadow-card);display:flex;align-items:center;gap:14px;min-width:215px}
+.hero__badge .ic{width:46px;height:46px;border-radius:13px;background:var(--plum-tint);display:grid;place-items:center;color:var(--plum);flex:none}
+.hero__badge .ic svg{width:24px;height:24px}
+.hero__badge b{display:block;font-size:22px;font-weight:800;color:#352f3d;line-height:1.1}
+.hero__badge span{font-size:13px;color:var(--muted);font-weight:600}
+.hero__glow{position:absolute;z-index:-1;width:60%;height:60%;top:-6%;inset-inline-end:-6%;background:radial-gradient(circle,rgba(50,100,200,.18),transparent 70%);filter:blur(10px)}
+
+/* ========== solutions ========== */
+.solutions{padding:70px 0}
+.solutions__grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-bottom:24px}
+.solutions__center{display:flex;justify-content:center}
+.solutions__center .solution-card{max-width:600px;width:100%}
+.solution-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:28px 30px;box-shadow:var(--shadow-soft);transition:.22s;position:relative;display:flex;flex-direction:column}
+.solution-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-card);border-color:#d3def0}
+.solution-card__icon{width:42px;height:42px;border-radius:11px;background:var(--plum-strong);color:#fff;display:grid;place-items:center;margin-bottom:18px}
+.solution-card__icon svg{width:22px;height:22px}
+.solution-card__head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.solution-card h3{font-size:21px;font-weight:800;color:#352f3d;letter-spacing:-.1px}
+.solution-card p{font-size:14.5px;line-height:1.85;color:#615c6b;font-weight:500;margin-bottom:20px;flex:1}
+.solution-card .btn{align-self:flex-start}
+
+/* ========== accreditations ========== */
+.awards{padding:60px 0 70px;text-align:center}
+.awards h2{font-size:32px;font-weight:800;color:#352f3d;margin-bottom:14px}
+.awards__sub{font-size:18px;line-height:1.7;color:#6b6675;max-width:760px;margin:0 auto 38px}
+.acc-local{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:900px;margin:0 auto 36px}
+.acc-card{height:140px;border-radius:18px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;padding:24px;transition:.22s}
+.acc-card:hover{border-color:#a8c0ee;box-shadow:var(--shadow-soft);transform:translateY(-2px)}
+.acc-card img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block}
+.acc-global{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:14px;max-width:1080px;margin:0 auto}
+.acc-chip{width:135px;height:86px;border-radius:14px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;padding:14px;transition:.22s}
+.acc-chip:hover{border-color:#a8c0ee;box-shadow:var(--shadow-soft);transform:translateY(-2px)}
+.acc-chip img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block}
+
+/* ========== customers (universities) ========== */
+.customers{padding:60px 0;background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.customers__head{text-align:center;max-width:720px;margin:0 auto 40px}
+.customers__head h2{font-size:30px;font-weight:800;color:#352f3d;line-height:1.4;letter-spacing:-.2px}
+.customers__grid{display:grid;grid-template-columns:repeat(6,1fr);gap:18px;max-width:1240px;margin:0 auto}
+.logo-slot{height:140px;border-radius:18px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;padding:22px;transition:.22s}
+.logo-slot:hover{border-color:#a8c0ee;box-shadow:var(--shadow-soft);transform:translateY(-2px)}
+.logo-slot img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block}
+
+/* ========== testimonial ========== */
+.testimonial{padding:80px 0;text-align:center}
+.testimonial__mark{font-family:Georgia,serif;font-size:90px;line-height:1;color:var(--plum);opacity:.55;display:inline-block;margin-bottom:-15px}
+.testimonial h2{font-size:30px;font-weight:800;color:#352f3d;margin-bottom:38px}
+.testimonial__wrap{max-width:920px;margin:0 auto;position:relative;display:flex;align-items:center;gap:18px}
+.testimonial__nav{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--plum);display:grid;place-items:center;cursor:pointer;flex:none;transition:.16s}
+.testimonial__nav:hover{border-color:var(--plum);background:var(--plum-tint)}
+.testimonial__nav svg{width:18px;height:18px}
+html[dir="rtl"] .testimonial__nav svg{transform:scaleX(-1)}
+.testimonial__card{flex:1;padding:8px 30px}
+.testimonial__quote{font-size:19px;line-height:1.75;color:#3a3340;font-weight:500;max-width:580px;margin:0 auto 28px}
+.testimonial__author{display:inline-flex;align-items:center;gap:18px;padding-top:22px;border-top:1px solid var(--line)}
+.testimonial__avatar{width:64px;height:64px;border-radius:12px;background:var(--plum-tint);color:var(--plum);display:grid;place-items:center;font-weight:800;font-size:14px;font-family:var(--font-en);letter-spacing:.5px;flex:none;border:1px solid var(--line)}
+.testimonial__who{text-align:start}
+.testimonial__who b{display:block;font-size:15px;font-weight:800;color:#352f3d;margin-bottom:2px}
+.testimonial__who span{display:block;font-size:13px;color:var(--muted);font-weight:500;line-height:1.6}
+
+/* ========== conference banner ========== */
+.conference{padding:30px 0 70px}
+.conference__card{background:linear-gradient(135deg,#352f3d 0%,var(--plum-dark) 50%,var(--plum-strong) 100%);border-radius:28px;padding:0;display:grid;grid-template-columns:1.05fr .95fr;overflow:hidden;box-shadow:0 40px 80px -40px rgba(30,68,160,.6);position:relative}
+.conference__card::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent 0,transparent 60px,rgba(255,255,255,.04) 60px,rgba(255,255,255,.04) 62px);pointer-events:none}
+.conference__text{padding:48px 50px;position:relative;z-index:2}
+.conference__year{display:inline-flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.conference__year h2{font-size:38px;font-weight:800;color:#fff;line-height:1.15;letter-spacing:-.4px;display:inline}
+.conference__year .year{font-size:38px;font-weight:800;color:rgba(255,255,255,.45);font-family:var(--font-en);letter-spacing:-.5px}
+.conference__sub{font-size:17px;color:rgba(255,255,255,.82);font-weight:500;margin:14px 0 30px;max-width:24em}
+.conference__meta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:28px;align-items:center}
+.conference__meta span{font-size:14px;font-weight:600;color:rgba(255,255,255,.92);background:rgba(255,255,255,.10);padding:8px 14px;border-radius:9px;display:inline-flex;align-items:center;gap:8px}
+.conference__meta span svg{width:14px;height:14px;opacity:.85}
+.conference__media{position:relative;background:rgba(255,255,255,.08);min-height:260px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.conference__media .slot-tag{font-size:12px;font-weight:700;color:rgba(255,255,255,.55);background:rgba(255,255,255,.06);border:1px dashed rgba(255,255,255,.3);padding:8px 14px;border-radius:8px;text-align:center}
+
+/* ========== promo cards (community + guide) ========== */
+.promos{padding:0 0 80px}
+.promos__grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.promo{border-radius:24px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;min-height:230px;box-shadow:var(--shadow-soft);position:relative}
+.promo--community{background:linear-gradient(140deg,#f0f6e9 0%,#dfe8ff 100%)}
+.promo--guide{background:linear-gradient(140deg,var(--plum-dark) 0%,var(--plum-strong) 100%);color:#fff}
+.promo__media{position:relative;background:rgba(0,0,0,.04);display:flex;align-items:center;justify-content:center;min-height:230px;order:2}
+.promo--guide .promo__media{background:rgba(255,255,255,.06)}
+.promo__media .slot-tag{font-size:11.5px;font-weight:700;color:rgba(25,55,140,.55);background:rgba(255,255,255,.7);border:1px dashed rgba(50,100,200,.4);padding:7px 12px;border-radius:8px;text-align:center}
+.promo--guide .promo__media .slot-tag{color:rgba(255,255,255,.55);background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.3)}
+.promo__text{padding:30px 30px;order:1;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.promo h3{font-size:22px;font-weight:800;line-height:1.3;letter-spacing:-.2px}
+.promo--community h3{color:#352f3d}
+.promo--guide h3{color:#fff}
+.promo p{font-size:14.5px;line-height:1.7;font-weight:500;max-width:24em}
+.promo--community p{color:#56505d}
+.promo--guide p{color:rgba(255,255,255,.85)}
+
+/* ========== footer ========== */
+.footer{background:#fff;border-top:1px solid var(--line);padding:60px 0 28px}
+.footer__grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:40px}
+.footer__brand img{height:44px;margin-bottom:18px}
+.footer__brand p{font-size:14.5px;color:var(--muted);font-weight:500;line-height:1.8;max-width:26em}
+.footer__social{display:flex;gap:10px;margin-top:20px}
+.footer__social a{width:38px;height:38px;border-radius:10px;background:var(--bg);display:grid;place-items:center;color:#7a7585;transition:.18s}
+.footer__social a:hover{background:var(--plum-tint);color:var(--plum)}
+.footer__social svg{width:18px;height:18px}
+.footer__col h4{font-size:14px;font-weight:800;color:#352f3d;margin-bottom:18px;letter-spacing:.3px}
+.footer__col a{display:block;font-size:14.5px;color:#615c6b;font-weight:500;margin-bottom:12px;transition:.16s}
+.footer__col a:hover{color:var(--plum)}
+.footer__bar{margin-top:48px;padding-top:24px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.footer__bar p{font-size:13.5px;color:var(--muted);font-weight:500}
+.footer__bar .links{display:flex;gap:24px}
+.footer__bar .links a{font-size:13.5px;color:var(--muted);font-weight:600}
+.footer__bar .links a:hover{color:var(--plum)}
+
+/* ========== responsive ========== */
+@media(max-width:980px){
+  .hero__grid{grid-template-columns:1fr;gap:40px}
+  .hero h1{font-size:42px}
+  .solutions__grid{grid-template-columns:1fr;gap:16px}
+  .customers__grid{grid-template-columns:repeat(4,1fr)}
+  .conference__card{grid-template-columns:1fr}
+  .promos__grid{grid-template-columns:1fr}
+  .promo{grid-template-columns:1fr}
+  .promo__media{min-height:180px}
+  .footer__grid{grid-template-columns:1fr 1fr;gap:32px}
+  .nav__links{display:none}
+  .announce__msg{font-size:13.5px}
+}
+@media(max-width:560px){
+  .wrap,.nav__in,.announce__in{padding-inline:20px}
+  .hero h1{font-size:32px}
+  .section-head h2,.testimonial h2,.awards h2,.customers__head h2,.conference__year h2,.conference__year .year{font-size:26px}
+  .testimonial__card{padding:8px}
+  .testimonial__nav{width:38px;height:38px}
+  .customers__grid{grid-template-columns:repeat(3,1fr)}
+  .acc-local{grid-template-columns:1fr 1fr;gap:12px}
+  .acc-card{height:110px;padding:18px}
+  .acc-chip{width:115px;height:74px}
+  .footer__grid{grid-template-columns:1fr}
+}
+/* ---- scroll reveal ---- */
+[data-reveal]{opacity:0;transform:translateY(28px);will-change:opacity,transform;
+  transition:opacity .7s cubic-bezier(.22,.61,.36,1),transform .7s cubic-bezier(.22,.61,.36,1);
+  transition-delay:var(--reveal-delay,0ms)}
+[data-reveal].is-in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  [data-reveal]{opacity:1!important;transform:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+  <!-- ============ NAV ============ -->
+  <!-- The ONE shared navbar lives in views/login_templates.xml (numo_website.numo_nav).
+       The controller renders that template and injects it here, so home/login/future
+       pages all share a single header definition. Edit the nav THERE, not here. -->
+  <!--NUMO_NAV-->
+
+  <main id="top">
+
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <div class="wrap hero__grid">
+        <div>
+          <span class="eyebrow" data-i18n="heroEyebrow">منصّة التعلّم الذكي · المملكة العربية السعودية</span>
+          <h1 data-i18n="heroH1">هذا هو التعليم والتعلّم <span class="accent plum">كما لم تشهده من قبل</span></h1>
+          <p class="hero__lede" data-i18n="heroLede">تقنية حديثة، مبتكرة، مدعومة بالذكاء الاصطناعي لتجارب تعليمية تحويلية تخدم الجامعات والمؤسسات في المملكة.</p>
+          <div class="hero__cta">
+            <a href="#solutions" class="btn btn--primary btn--md">
+              <span data-i18n="heroCta1">اكتشف الحلول</span>
+              <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a href="#story" class="btn btn--ghost btn--md" data-i18n="heroCta2">شاهد قصّتنا</a>
+          </div>
+        </div>
+        <div class="hero__media">
+          <div class="hero__glow"></div>
+          <div class="hero__photo"><img src="/numo_website/static/src/img/hero.webp" alt=""></div>
+          <div class="hero__badge">
+            <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 4 6v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6l-8-4Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+            <div><b data-i18n="badgeNum">+120</b><span data-i18n="badgeLbl">جهة تعليمية شريكة</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SOLUTIONS ============ -->
+    <section class="solutions" id="solutions">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 data-i18n="solH2">اكتشف حلولنا المتمحورة حول الإنسان والمدعومة بالذكاء الاصطناعي</h2>
+        </div>
+        <div class="solutions__grid">
+          <!-- 1 -->
+          <article class="solution-card">
+            <div class="solution-card__head">
+              <span class="solution-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6"/></svg></span>
+              <h3 data-i18n="sol1H">منصّة نُمو للجامعات والكليات</h3>
+            </div>
+            <p data-i18n="sol1P">حلولنا للجامعات والكليات تشمل نظاماً رائداً لإدارة التعلّم مع قدرات ذكاء اصطناعي توليدية مدمجة، توفّر وقت أعضاء هيئة التدريس وتُمكّن تجارب تعلّم تعاونية ومُخصّصة للطلاب في كل مكان.</p>
+          </article>
+          <!-- 2 -->
+          <article class="solution-card">
+            <div class="solution-card__head">
+              <span class="solution-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l8 4v6c0 4.5-3.4 7.8-8 9-4.6-1.2-8-4.5-8-9V7l8-4Z"/><path d="M8 12h8M12 8v8"/></svg></span>
+              <h3 data-i18n="sol2H">منصّة نُمو للجهات الحكومية</h3>
+            </div>
+            <p data-i18n="sol2P">حلول إدارة التعلّم للجهات الحكومية، تشمل نظامنا الرائد المدعوم بالذكاء الاصطناعي، تُمكّنك من تقديم برامج تدريب آمنة وقابلة للتوسّع تحافظ على جاهزية فرق العمل في كل مهمّة.</p>
+          </article>
+          <!-- 3 -->
+          <article class="solution-card">
+            <div class="solution-card__head">
+              <span class="solution-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span>
+              <h3 data-i18n="sol3H">نُمو للوصول الشامل</h3>
+            </div>
+            <p data-i18n="sol3P">مع نُمو للوصول الشامل، يستطيع المدرّسون توفير محتوى رقمي ميسّر وشامل بسرعة وسهولة، مخصّص لاحتياجات وتحدّيات كل متعلّم، موفّراً للوقت ومُمكّناً للجميع من النجاح.</p>
+          </article>
+          <!-- 4 -->
+          <article class="solution-card">
+            <div class="solution-card__head">
+              <span class="solution-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 4h16v16H4z"/><path d="M8 4v16M4 9h4M4 14h4M16 4v16M16 9h4M16 14h4"/></svg></span>
+              <h3 data-i18n="sol4H">نُمو للتقييم</h3>
+            </div>
+            <p data-i18n="sol4P">بسّط عملية تقييم المقرّرات، من توزيع الاستبيانات وحتى التقارير، لتزويد أعضاء هيئة التدريس والإدارة بتغذية راجعة دقيقة وفي الوقت المناسب لتحسين مخرجات التعلّم.</p>
+          </article>
+        </div>
+
+        <div class="solutions__center">
+          <article class="solution-card">
+            <div class="solution-card__head">
+              <span class="solution-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V8M10 20V4M16 20V12M22 20V6"/></svg></span>
+              <h3 data-i18n="sol5H">الفاعلية المؤسسية</h3>
+            </div>
+            <p data-i18n="sol5P">التحسين المستمر يتطلّب رؤى مستمرّة. حلولنا لإدارة التقييم تشمل قياس المخرجات، التخطيط الاستراتيجي، مراجعة البرامج، والاعتماد، لمساعدة المؤسسات على التعلّم من بياناتها واتّخاذ القرار.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ AWARDS ============ -->
+    <section class="awards" id="awards">
+      <div class="wrap">
+        <h2 data-i18n="awardsH2">الإعتمادات</h2>
+        <p class="awards__sub" data-i18n="awardsSub">نمو تهدف إلى تقديم مسارات ابتكارية مرتبطة باحتياجات سوق العمل بالشراكة مع جهات عالمية</p>
+        <!-- Saudi government accreditations -->
+        <div class="acc-local">
+          <a href="#" class="acc-card"><img src="/numo_website/static/src/img/accreditations/moe.png" alt="وزارة التعليم"></a>
+          <a href="#" class="acc-card"><img src="/numo_website/static/src/img/accreditations/nelc.png" alt="المركز الوطني للتعليم الإلكتروني"></a>
+          <a href="#" class="acc-card"><img src="/numo_website/static/src/img/accreditations/tvtc.png" alt="المؤسسة العامة للتدريب التقني والمهني"></a>
+        </div>
+        <!-- Global certifications -->
+        <div class="acc-global">
+          <a href="#" class="acc-chip"><img src="/numo_website/static/src/img/accreditations/global-1.png" alt="CompTIA"></a>
+          <a href="#" class="acc-chip"><img src="/numo_website/static/src/img/accreditations/global-2.png" alt="K-BIZ"></a>
+          <a href="#" class="acc-chip"><img src="/numo_website/static/src/img/accreditations/global-3.png" alt="ATP"></a>
+          <a href="#" class="acc-chip"><img src="/numo_website/static/src/img/accreditations/global-4.png" alt="NASP"></a>
+          <a href="#" class="acc-chip"><img src="/numo_website/static/src/img/accreditations/global-5.png" alt="IOSH"></a>
+          <a href="#" class="acc-chip"><img src="/numo_website/static/src/img/accreditations/global-6.png" alt="Scaffold Training Institute"></a>
+          <a href="#" class="acc-chip"><img src="/numo_website/static/src/img/accreditations/global-7.png" alt="ISO"></a>
+          <a href="#" class="acc-chip"><img src="/numo_website/static/src/img/accreditations/global-8.png" alt="NEBOSH"></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CUSTOMERS / UNIVERSITIES ============ -->
+    <section class="customers" id="customers">
+      <div class="wrap">
+        <div class="customers__head">
+          <h2 data-i18n="custH2">انضمّ إلى ملايين المعلّمين والمتعلّمين حول العالم الذين يستخدمون حلول نُمو للازدهار</h2>
+        </div>
+        <div class="customers__grid">
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/alrajhi_university.png" alt="جامعة سليمان الراجحي"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/saudi_electronic_university.png" alt="الجامعة السعودية الإلكترونية"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/jeddah_university.png" alt="جامعة جدة"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/najran_university.png" alt="جامعة نجران"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/jazan_university.png" alt="جامعة جازان"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/hafr_albatin_university.png" alt="جامعة حفر الباطن"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/alrayan_college.png" alt="كليات الريان الأهلية"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/ubt_university.png" alt="جامعة الأعمال والتكنولوجيا"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/almobdioon_center.png" alt="مركز المبدعون"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/makkah_chamber.png" alt="غرفة مكة المكرمة"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/najran_chamber.png" alt="غرفة نجران"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/tabuk_chamber.png" alt="غرفة تبوك"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/yanbu_chamber.png" alt="غرفة ينبع"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/unaizah_chamber.png" alt="غرفة عنيزة"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/aljouf_chamber.png" alt="غرفة الجوف"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/bisha_chamber.png" alt="غرفة بيشة"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/qurayyat_chamber.png" alt="غرفة القريات"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/zulfi_chamber.png" alt="غرفة الزلفي"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/king_saud_university.png" alt="جامعة الملك سعود"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/holy_mosques.png" alt="هيئة شؤون الحرمين الشريفين"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/passport_dept.png" alt="المديرية العامة للجوازات"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/ministry_defense.png" alt="وزارة الدفاع"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/ministry_labor.png" alt="وزارة العمل والتنمية الاجتماعية"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/civil_defense.png" alt="الدفاع المدني"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/kfshrc.png" alt="مستشفى الملك فيصل التخصصي ومركز الأبحاث"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/hadaf.png" alt="هدف · صندوق تنمية الموارد البشرية"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/abha_chamber.png" alt="غرفة أبها"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/alkharj_municipality.png" alt="بلدية محافظة الخرج"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/research_institute.png" alt="معهد البحوث والدراسات"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/nahaz_investment.png" alt="نهاز للاستثمار"></a>
+          <a href="#" class="logo-slot"><img src="/numo_website/static/src/img/clients/halwa_charity.png" alt="جمعية الحلوة الخيرية"></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TESTIMONIAL ============ -->
+    <section class="testimonial">
+      <div class="wrap">
+        <span class="testimonial__mark">”</span>
+        <h2 data-i18n="testH2">ماذا يقول عملاؤنا</h2>
+        <div class="testimonial__wrap">
+          <button class="testimonial__nav" aria-label="prev">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div class="testimonial__card">
+            <p class="testimonial__quote" data-i18n="testQuote">أحدث نُمو فرقاً حقيقياً معنا، أصبح بإمكاننا العودة إلى أعضاء هيئة التدريس ونقول لهم: "تذكر تلك الميزة التي طلبتها؟ ها هي في الإصدار التالي!"</p>
+            <div class="testimonial__author">
+              <div class="testimonial__avatar"><span data-i18n="testInit">KSU</span></div>
+              <div class="testimonial__who">
+                <b data-i18n="testName">د. خالد العتيبي</b>
+                <span data-i18n="testRole">مدير تقنيات التعلّم الإلكتروني</span>
+                <span data-i18n="testOrg">جامعة الملك سعود</span>
+              </div>
+            </div>
+          </div>
+          <button class="testimonial__nav" aria-label="next">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TWO PROMO CARDS ============ -->
+    <section class="promos">
+      <div class="wrap promos__grid">
+        <!-- community -->
+        <article class="promo promo--community">
+          <div class="promo__text">
+            <h3 data-i18n="promo1H">عملاء نُمو: انضمّوا إلى المجتمع</h3>
+            <p data-i18n="promo1P">تواصل وتعاون وشارك أفضل الممارسات، مجتمع نُمو هو مساحتك لتطوير معرفتك وأثرك.</p>
+            <a href="#" class="btn btn--primary btn--xs" style="align-self:flex-start" data-i18n="promo1Cta">تصفّح المجتمع</a>
+          </div>
+          <div class="promo__media">
+            <span class="slot-tag" data-i18n="promoSlot">صورة · استبدلها</span>
+          </div>
+        </article>
+        <!-- guide -->
+        <article class="promo promo--guide">
+          <div class="promo__text">
+            <h3 data-i18n="promo2H">دليلك إلى الجاهزية الرقمية</h3>
+            <p data-i18n="promo2P">حمّل دليلنا الشامل لاستراتيجية التحوّل الرقمي ومتطلّبات الجاهزية للأنظمة الجديدة.</p>
+            <a href="#" class="btn btn--white btn--xs" style="align-self:flex-start" data-i18n="promo2Cta">حمّل الدليل</a>
+          </div>
+          <div class="promo__media">
+            <span class="slot-tag" data-i18n="promoSlot">صورة · استبدلها</span>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <img src="/numo_website/static/src/img/logo.png" alt="numo GROUP">
+          <p data-i18n="footBrand">مجموعة نُمو للتدريب والتعليم، نُمكّن مستقبل التعلّم الإلكتروني في المملكة العربية السعودية بالتقنية والذكاء الاصطناعي.</p>
+          <div class="footer__social">
+            <a href="#" aria-label="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7 8 8.2 12h-6.4l-5-7-5.7 7H2l7.5-9L1.6 2h6.6l4.5 6.4L18.9 2Z"/></svg></a>
+            <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 1 0 3.5a2.5 2.5 0 0 1 4.98 0ZM0 8h5v16H0V8Zm7.5 0h4.8v2.2h.07c.67-1.2 2.3-2.5 4.73-2.5 5 0 5.9 3.3 5.9 7.6V24h-5v-7c0-1.7 0-3.8-2.3-3.8s-2.7 1.8-2.7 3.7V24h-5V8Z"/></svg></a>
+            <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 7.5a3 3 0 0 0-2.1-2.1C19 5 12 5 12 5s-7 0-8.9.4A3 3 0 0 0 1 7.5 31 31 0 0 0 .6 12 31 31 0 0 0 1 16.5a3 3 0 0 0 2.1 2.1C5 19 12 19 12 19s7 0 8.9-.4a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .4-4.5 31 31 0 0 0-.4-4.5ZM9.7 15.4V8.6l6 3.4-6 3.4Z"/></svg></a>
+          </div>
+        </div>
+        <div class="footer__col">
+          <h4 data-i18n="footC2">الحلول</h4>
+          <a href="#" data-i18n="footS1">منصّة الجامعات</a>
+          <a href="#" data-i18n="footS2">منصّة الحكومة</a>
+          <a href="#" data-i18n="footS3">الوصول الشامل</a>
+          <a href="#" data-i18n="footS4">التقييم والتحليلات</a>
+        </div>
+        <div class="footer__col">
+          <h4 data-i18n="footC3">تواصل</h4>
+          <a href="#" data-i18n="footT1">الرياض، الدائري الشرقي مخرج 10، الرياض، المملكة العربية السعودية</a>
+          <a href="mailto:info@numo.sa" data-i18n="footT2">info@numo.sa</a>
+          <a href="tel:920022136" data-i18n="footT3">‎920022136</a>
+          <a href="tel:+966500808104" data-i18n="footT4">‎+966500808104</a>
+        </div>
+      </div>
+      <div class="footer__bar">
+        <p data-i18n="footer">جميع الحقوق محفوظة © 2026 مجموعة نمو</p>
+        <div class="links">
+          <a href="#" data-i18n="footPriv">سياسة الخصوصية</a>
+          <a href="#" data-i18n="footTerms">الشروط والأحكام</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+<script>
+const I18N = {
+  ar:{ dir:"rtl", label:"English",
+    annChip:"جديد", annMsg:"نُمو الآن، شركة مستقلّة مكرّسة بالكامل للتعليم والتعلّم في المملكة", annLink:"اقرأ قصّتنا",
+    navSolutions:"الحلول", navAwards:"الإعتمادات", navCustomers:"العملاء", navStory:"قصّتنا", navLogin:"تسجيل الدخول",
+    heroEyebrow:"منصّة التعلّم الذكي · المملكة العربية السعودية",
+    heroH1:'هذا هو التعليم والتعلّم <span class="accent plum">كما لم تشهده من قبل</span>',
+    heroLede:"تقنية حديثة، مبتكرة، مدعومة بالذكاء الاصطناعي لتجارب تعليمية تحويلية تخدم الجامعات والمؤسسات في المملكة.",
+    heroCta1:"اكتشف الحلول", heroCta2:"شاهد قصّتنا",
+    badgeNum:"+120", badgeLbl:"جهة تعليمية شريكة",
+    solH2:"اكتشف حلولنا المتمحورة حول الإنسان والمدعومة بالذكاء الاصطناعي", solMore:"المزيد",
+    sol1H:"منصّة نُمو للجامعات والكليات",
+    sol1P:"حلولنا للجامعات والكليات تشمل نظاماً رائداً لإدارة التعلّم مع قدرات ذكاء اصطناعي توليدية مدمجة، توفّر وقت أعضاء هيئة التدريس وتُمكّن تجارب تعلّم تعاونية ومُخصّصة للطلاب في كل مكان.",
+    sol2H:"منصّة نُمو للجهات الحكومية",
+    sol2P:"حلول إدارة التعلّم للجهات الحكومية، تشمل نظامنا الرائد المدعوم بالذكاء الاصطناعي، تُمكّنك من تقديم برامج تدريب آمنة وقابلة للتوسّع تحافظ على جاهزية فرق العمل في كل مهمّة.",
+    sol3H:"نُمو للوصول الشامل",
+    sol3P:"مع نُمو للوصول الشامل، يستطيع المدرّسون توفير محتوى رقمي ميسّر وشامل بسرعة وسهولة، مخصّص لاحتياجات وتحدّيات كل متعلّم، موفّراً للوقت ومُمكّناً للجميع من النجاح.",
+    sol4H:"نُمو للتقييم",
+    sol4P:"بسّط عملية تقييم المقرّرات، من توزيع الاستبيانات وحتى التقارير، لتزويد أعضاء هيئة التدريس والإدارة بتغذية راجعة دقيقة وفي الوقت المناسب لتحسين مخرجات التعلّم.",
+    sol5H:"الفاعلية المؤسسية",
+    sol5P:"التحسين المستمر يتطلّب رؤى مستمرّة. حلولنا لإدارة التقييم تشمل قياس المخرجات، التخطيط الاستراتيجي، مراجعة البرامج، والاعتماد، لمساعدة المؤسسات على التعلّم من بياناتها واتّخاذ القرار.",
+    awardsH2:"الإعتمادات",
+    awardsSub:"نمو تهدف إلى تقديم مسارات ابتكارية مرتبطة باحتياجات سوق العمل بالشراكة مع جهات عالمية",
+    custH2:"انضمّ إلى ملايين المعلّمين والمتعلّمين حول العالم الذين يستخدمون حلول نُمو للازدهار",
+    cu1:"جامعة الملك سعود", cu2:"جامعة الإمام", cu3:"جامعة الملك عبدالعزيز", cu4:"الكلية التقنية", cu5:"جامعة الأميرة نورة",
+    cu6:"جامعة الملك فهد", cu7:"جامعة الملك خالد", cu8:"جامعة طيبة", cu9:"جامعة جدة",
+    testH2:"ماذا يقول عملاؤنا",
+    testQuote:'أحدث نُمو فرقاً حقيقياً معنا، أصبح بإمكاننا العودة إلى أعضاء هيئة التدريس ونقول لهم: "تذكر تلك الميزة التي طلبتها؟ ها هي في الإصدار التالي!"',
+    testInit:"KSU", testName:"د. خالد العتيبي", testRole:"مدير تقنيات التعلّم الإلكتروني", testOrg:"جامعة الملك سعود",
+    confH2:"نلتقي في نُمو", confSub:"انضمّ إلينا في مؤتمر المستخدمين السنوي، لقاء صنّاع مستقبل التعلّم الإلكتروني في المملكة.",
+    confDate:"13–15 يوليو 2026", confVenue:"الرياض، المملكة العربية السعودية", confCta:"احجز مقعدك", confSlot:"صورة المؤتمر · استبدلها لاحقاً",
+    promo1H:"عملاء نُمو: انضمّوا إلى المجتمع",
+    promo1P:"تواصل وتعاون وشارك أفضل الممارسات، مجتمع نُمو هو مساحتك لتطوير معرفتك وأثرك.",
+    promo1Cta:"تصفّح المجتمع",
+    promo2H:"دليلك إلى الجاهزية الرقمية",
+    promo2P:"حمّل دليلنا الشامل لاستراتيجية التحوّل الرقمي ومتطلّبات الجاهزية للأنظمة الجديدة.",
+    promo2Cta:"حمّل الدليل", promoSlot:"صورة · استبدلها",
+    footBrand:"مجموعة نُمو للتدريب والتعليم، نُمكّن مستقبل التعلّم الإلكتروني في المملكة العربية السعودية بالتقنية والذكاء الاصطناعي.",
+    footC2:"الحلول", footS1:"منصّة الجامعات", footS2:"منصّة الحكومة", footS3:"الوصول الشامل", footS4:"التقييم والتحليلات",
+    footC3:"تواصل", footT1:"الرياض، الدائري الشرقي مخرج 10، الرياض، المملكة العربية السعودية", footT2:"info@numo.sa", footT3:"‎920022136", footT4:"‎+966500808104",
+    footer:"جميع الحقوق محفوظة © 2026 مجموعة نمو", footPriv:"سياسة الخصوصية", footTerms:"الشروط والأحكام"
+  },
+  en:{ dir:"ltr", label:"العربية",
+    annChip:"NEW", annMsg:"Numo is now an independent company focused entirely on teaching and learning in Saudi Arabia", annLink:"Read our story",
+    navSolutions:"Solutions", navAwards:"Accreditations", navCustomers:"Customers", navStory:"Our story", navLogin:"Sign in",
+    heroEyebrow:"AI-Powered Learning Platform · Saudi Arabia",
+    heroH1:'This is teaching and learning <span class="accent plum">like never before</span>',
+    heroLede:"Modern, innovative, AI-powered technology for transformational learning experiences, serving universities and institutions across the Kingdom.",
+    heroCta1:"Explore solutions", heroCta2:"Watch our story",
+    badgeNum:"120+", badgeLbl:"partner institutions",
+    solH2:"Discover our human-centered, AI-powered solutions", solMore:"Learn more",
+    sol1H:"Numo for Higher Education",
+    sol1P:"Our solutions for colleges and universities include the industry's most innovative, market-leading LMS with built-in generative AI capabilities, saving faculty time and enabling collaborative, personalized learning experiences for students everywhere.",
+    sol2H:"Numo for Government",
+    sol2P:"Our learning management solutions for government agencies, including our market-leading AI-powered LMS, empower you to provide secure, scalable workforce training programs that keep everyone mission-ready.",
+    sol3H:"Numo Ally",
+    sol3P:"With Ally, instructors can quickly and easily deliver accessible and inclusive digital content that's personalized to each learner's needs, challenges, and preferences, saving time and helping everyone succeed.",
+    sol4H:"Numo Evaluate",
+    sol4P:"Simplify the course evaluation process, from survey delivery to reporting, to give your faculty and administrators the timely, meaningful feedback they need to improve learning outcomes.",
+    sol5H:"Institutional Effectiveness",
+    sol5P:"Continuous improvement requires continuous insight. Our assessment-management solutions span outcomes measurement, strategic planning, program review, and accreditation, helping institutions learn from their own data and act on it.",
+    awardsH2:"Accreditations",
+    awardsSub:"Numo aims to deliver innovative pathways aligned with labor-market needs, in partnership with global entities",
+    custH2:"Join millions of educators and learners around the world using Numo's solutions to thrive",
+    cu1:"King Saud University", cu2:"Imam University", cu3:"King Abdulaziz University", cu4:"Technical College", cu5:"Princess Nourah University",
+    cu6:"King Fahd University", cu7:"King Khalid University", cu8:"Taibah University", cu9:"University of Jeddah",
+    testH2:"What our customers are saying",
+    testQuote:'Numo has made a huge difference for us, we can go back to faculty and say, "Remember that feature you asked for? Well, here it is in the next release!"',
+    testInit:"KSU", testName:"Dr. Khalid Al-Otaibi", testRole:"Director of eLearning Technologies", testOrg:"King Saud University",
+    confH2:"Building Numo Together", confSub:"Join us for our flagship user conference, where the makers of e-learning in the Kingdom meet.",
+    confDate:"July 13–15, 2026", confVenue:"Riyadh, Saudi Arabia", confCta:"Reserve your seat", confSlot:"Conference image · replace later",
+    promo1H:"Numo customers: Join the community",
+    promo1P:"Connect, collaborate, and share best practices, the Numo Community is your space to grow your knowledge and impact.",
+    promo1Cta:"Explore the community",
+    promo2H:"Your guide to digital readiness",
+    promo2P:"Download our comprehensive guide to digital transformation strategy and readiness for new regulations.",
+    promo2Cta:"Get the guide", promoSlot:"Image · replace",
+    footBrand:"Numo Group for Training & Education, empowering the future of e-learning in Saudi Arabia through technology and artificial intelligence.",
+    footC2:"Solutions", footS1:"University platform", footS2:"Government platform", footS3:"Ally accessibility", footS4:"Evaluate & analytics",
+    footC3:"Contact", footT1:"Riyadh, Eastern Ring Road, Exit 10, Riyadh, Saudi Arabia", footT2:"info@numo.sa", footT3:"‎920022136", footT4:"‎+966500808104",
+    footer:"All rights reserved © 2026 Numo Group", footPriv:"Privacy policy", footTerms:"Terms & conditions"
+  }
+};
+const HTML_KEYS = new Set(["heroH1"]);
+const html = document.documentElement;
+function applyLang(lang){
+  const t = I18N[lang];
+  html.setAttribute("lang", lang); html.setAttribute("dir", t.dir); html.setAttribute("data-lang", lang);
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const k = el.getAttribute("data-i18n"); if(!(k in t)) return;
+    if(HTML_KEYS.has(k)) el.innerHTML = t[k]; else el.textContent = t[k];
+  });
+}
+// Language follows the URL prefix set by the server (/ar → Arabic, otherwise
+// English). The language pill in the nav is a server-rendered link that points
+// to the same page in the other language, so switching just navigates there.
+applyLang(/^\/ar(\/|$)/.test(location.pathname) ? "ar" : "en");
+
+/* ---- scroll reveal ---- */
+(function(){
+  var groups = [".solutions__grid",".solutions__center",".acc-local",".acc-global",".customers__grid",".footer__grid"];
+  groups.forEach(function(sel){
+    document.querySelectorAll(sel).forEach(function(g){
+      Array.prototype.forEach.call(g.children, function(child, i){
+        child.setAttribute("data-reveal","");
+        /* row-based cascade: delay resets each row so big grids never lag */
+        child.style.setProperty("--reveal-delay", ((i%6)*60)+"ms");
+      });
+    });
+  });
+  var solos = [".hero__grid > div",".section-head",".awards h2",".awards__sub",".customers__head",".testimonial__wrap",".promo"];
+  solos.forEach(function(sel){
+    document.querySelectorAll(sel).forEach(function(el){ el.setAttribute("data-reveal",""); });
+  });
+  var items = document.querySelectorAll("[data-reveal]");
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+  if(reduce || !("IntersectionObserver" in window)){
+    items.forEach(function(el){ el.classList.add("is-in"); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add("is-in"); io.unobserve(e.target); }
+    });
+  }, {threshold:0.12, rootMargin:"0px 0px -8% 0px"});
+  items.forEach(function(el){ io.observe(el); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# OS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# IDE / tooling
+.idea/
+.vscode/
+.claude-flow/
+
+# Odoo runtime
+*.log

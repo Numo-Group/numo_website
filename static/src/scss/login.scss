@@ -1,0 +1,250 @@
+/*
+ * numo GROUP login — ported verbatim from "Numo Login.html" (source of truth),
+ * scoped under .numo-page so it never leaks into the rest of Odoo, with
+ * `html[data-lang=…]` swapped for `[dir=…]` (Odoo sets <html dir> per language).
+ *
+ * The design handles RTL/LTR itself via logical properties + [dir] rules, so we
+ * opt out of Odoo's automatic CSS mirroring for this file.
+ */
+/*rtl:begin:ignore*/
+
+:root{
+  --bg:#f5f4fc;
+  --card:#ffffff;
+  --plum:#4774D0;
+  --plum-strong:#2A5BC8;
+  --plum-dark:#1D44A0;
+  --plum-tint:#E5EDFB;
+  --ink:#352f3d;
+  --text:#4c4856;
+  --muted:#8b8794;
+  --line:#ece9f2;
+  --field-border:#e6e2ee;
+  --field-border-focus:#4774D0;
+  --shadow-card:0 30px 70px -30px rgba(25,55,140,.28), 0 8px 24px -16px rgba(25,55,140,.18);
+  --radius-card:26px;
+  --radius-field:13px;
+  --font-ar:"Cairo",system-ui,sans-serif;
+  --font-en:"Plus Jakarta Sans",system-ui,sans-serif;
+}
+
+/* Full-bleed: neutralise whatever login wrapper Odoo (or the website module)
+   puts around our page, regardless of structure. */
+body:has(.numo-page){background:var(--bg);margin:0}
+/* Odoo's JS assets inject an off-screen font probe (#sar-font-canary) at
+   position:absolute; left:-9999px; top:-9999px. Its containing block is the
+   VIEWPORT, so on our RTL auth pages that negative offset expands the scrollable
+   width to ~11000px — a huge empty area you can scroll into. (Overflow clipping
+   on <html>/<body> can't contain a viewport-positioned element, and the probe
+   re-applies its inline position via JS.) Pin the probe to the origin instead:
+   it stays visibility:hidden (invisible, still measurable for font detection)
+   but no longer overflows. Scoped to auth pages only. */
+body:has(.numo-page) #sar-font-canary{inset-block-start:0!important;inset-inline-start:0!important;left:0!important;top:0!important}
+.container:has(> .numo-page),
+.o_database_list:has(.numo-page),
+.oe_website_login_container:has(.numo-page){
+  max-width:none !important;width:auto !important;margin:0 !important;padding:0 !important;
+  background:transparent !important;border:0 !important;box-shadow:none !important;border-radius:0 !important;
+}
+.o_database_list:has(.numo-page) .card-body{padding:0 !important}
+.o_database_list:has(.numo-page) > .card-body > .text-center{display:none !important}
+/* When the `website` module is installed it wraps login in website.layout and
+   shows its navbar/footer — hide them on our auth pages. */
+body:has(.numo-page) #wrapwrap > header,
+body:has(.numo-page) #wrapwrap > footer,
+body:has(.numo-page) #wrapwrap > .o_livechat_button{display:none !important}
+body:has(.numo-page) #wrapwrap, body:has(.numo-page) #wrapwrap > main{padding:0 !important;margin:0 !important}
+
+.numo-page *{box-sizing:border-box;margin:0;padding:0}
+.numo-page{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-ar);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  padding:30px 34px 22px;
+}
+[dir="ltr"] .numo-page{font-family:var(--font-en)}
+
+/* ---------- top nav (matches home page header) ---------- */
+.numo-page .nav{
+  /* break out of the .numo-page padding (30px 34px) for a full-bleed sticky bar */
+  margin:-30px -34px 22px;
+  padding:14px 0;position:sticky;top:0;z-index:50;
+  background:rgba(245,244,252,.86);backdrop-filter:saturate(160%) blur(14px);
+  -webkit-backdrop-filter:saturate(160%) blur(14px);
+  border-bottom:1px solid rgba(236,233,242,.9);
+}
+.numo-page .nav__in{max-width:1466px;width:100%;margin:0 auto;padding:0 40px;display:flex;align-items:center;gap:30px}
+.numo-page .nav__logo{display:inline-flex;align-items:center;text-decoration:none}
+.numo-page .nav__logo img{height:42px;width:auto;display:block}
+.numo-page .nav__links{display:flex;align-items:center;gap:30px;margin-inline-start:18px}
+.numo-page .nav__links a{font-size:15px;font-weight:600;color:#534e5e;text-decoration:none;transition:.16s;position:relative}
+.numo-page .nav__links a:hover{color:var(--plum)}
+.numo-page .nav__links a::after{content:"";position:absolute;inset-inline-start:0;bottom:-6px;height:2px;width:0;background:var(--plum);transition:.2s;border-radius:2px}
+.numo-page .nav__links a:hover::after{width:100%}
+.numo-page .nav__right{margin-inline-start:auto;display:flex;align-items:center;gap:14px}
+/* nav CTA: small auto-width pill (overrides the full-width .btn base) */
+.numo-page .nav .btn{width:auto;height:44px;padding:0 20px;font-size:14.5px;border-radius:12px;text-decoration:none}
+
+.numo-page .lang-toggle{
+  display:inline-flex;align-items:center;gap:9px;
+  background:#fff;border:1px solid var(--line);border-radius:999px;
+  padding:9px 16px;font-family:var(--font-ar);font-size:14px;font-weight:600;color:#5a5663;
+  cursor:pointer;transition:.18s;box-shadow:0 1px 2px rgba(60,40,70,.04);text-decoration:none}
+[dir="ltr"] .numo-page .lang-toggle{font-family:var(--font-en)}
+.numo-page .lang-toggle:hover{border-color:var(--field-border-focus);color:var(--plum);box-shadow:0 4px 12px -6px rgba(71,116,208,.4)}
+.numo-page .lang-toggle svg{width:17px;height:17px}
+.numo-page .lang-toggle .chev{width:13px;height:13px;opacity:.6}
+
+/* ---------- card ---------- */
+.numo-page .card{
+  flex:1 0 auto;max-width:1466px;width:100%;margin:0 auto;border:0;
+  background:var(--card);border-radius:var(--radius-card);
+  box-shadow:var(--shadow-card);
+  display:grid;grid-template-columns:1fr 1.04fr;overflow:hidden;
+}
+
+/* ---------- hero (left) ---------- */
+.numo-page .hero{padding:18px;order:2}
+.numo-page .form-wrap{order:1}
+.numo-page .hero__media{
+  position:relative;height:100%;border-radius:18px;overflow:hidden;
+  background:url("/numo_website/static/src/img/hero.webp") center/cover no-repeat;
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:48px 48px 40px;
+}
+[dir="ltr"] .numo-page .hero__media{background-image:url("/numo_website/static/src/img/hero-ltr.webp")}
+.numo-page .hero__scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.28) 0%,rgba(255,255,255,0) 28%,rgba(60,30,55,.04) 66%,rgba(60,30,55,.16) 100%)}
+[dir="ltr"] .numo-page .hero__scrim{background:
+  linear-gradient(to left, rgba(255,255,255,.5) 0%, rgba(255,255,255,.14) 36%, rgba(255,255,255,0) 62%),
+  linear-gradient(180deg, rgba(255,255,255,.18) 0%, rgba(255,255,255,0) 30%, rgba(60,30,55,.05) 66%, rgba(60,30,55,.16) 100%)}
+.numo-page .hero__top,.numo-page .hero__bottom{position:relative;z-index:2}
+.numo-page .hero__top{margin-top:30%}
+[dir="ltr"] .numo-page .hero__media{align-items:flex-end;text-align:right}
+[dir="ltr"] .numo-page .hero__top{display:flex;flex-direction:column;align-items:flex-end}
+[dir="ltr"] .numo-page .quote{text-align:center}
+[dir="rtl"] .numo-page .hero__media{align-items:flex-end;text-align:left}
+[dir="rtl"] .numo-page .hero__top{display:flex;flex-direction:column;align-items:flex-end}
+[dir="rtl"] .numo-page .quote{align-items:center;text-align:center}
+.numo-page .hero__title{font-size:34px;font-weight:800;line-height:1.45;color:var(--plum-strong);max-width:9em;text-shadow:0 2px 16px rgba(255,255,255,.9),0 1px 2px rgba(255,255,255,.95)}
+.numo-page .hero__title-main{display:block}
+[dir="rtl"] .numo-page .hero__title-main{font-weight:600}
+.numo-page .hero__title-big{display:block;font-size:50px;line-height:1.04;font-weight:800;letter-spacing:-.02em;margin-top:.06em}
+.numo-page .hero__title-big:empty{display:none}
+.numo-page .hero__rule{width:54px;height:4px;border-radius:4px;background:var(--plum-strong);margin:22px 0 26px;opacity:.85}
+.numo-page .hero__lede{font-size:16px;font-weight:500;line-height:2;color:#5f4a5e;max-width:24em;text-shadow:0 1px 12px rgba(255,255,255,.85),0 1px 2px rgba(255,255,255,.9)}
+.numo-page .quote{
+  position:relative;max-width:330px;
+  background:rgba(255,255,255,.42);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);
+  border:1px solid rgba(255,255,255,.6);border-radius:16px;
+  padding:18px 28px 20px;color:#4a3a4c;font-size:15px;font-weight:600;line-height:1.9;
+  box-shadow:0 18px 40px -24px rgba(70,40,70,.5);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.numo-page .quote__mark{font-family:Georgia,serif;font-size:42px;line-height:.7;color:rgba(71,116,208,.4)}
+.numo-page .quote__mark--top{position:absolute;top:10px;right:20px;margin:0}
+.numo-page .quote__mark--bottom{position:absolute;bottom:0;left:20px;margin:0;transform:rotate(180deg)}
+
+/* ---------- form (right) ---------- */
+.numo-page .form-wrap{padding:46px 76px;display:flex;flex-direction:column;justify-content:center}
+.numo-page .form-inner{width:100%;max-width:470px;margin:0 auto}
+
+/* ---------- reset-done success interstitial ---------- */
+.numo-page .numo-done{text-align:center}
+.numo-page .numo-done__check{width:74px;height:74px;margin:0 auto 22px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;color:#fff;
+  background:linear-gradient(135deg,var(--plum),var(--plum-strong));
+  box-shadow:0 14px 30px -10px rgba(42,91,200,.55);animation:numo-pop .45s cubic-bezier(.22,1.2,.4,1) both}
+.numo-page .numo-done__check svg{width:38px;height:38px}
+.numo-page .numo-done__sub{display:flex;align-items:center;justify-content:center;gap:9px}
+.numo-page .numo-done__spin{width:15px;height:15px;border-radius:50%;
+  border:2px solid var(--plum-tint);border-top-color:var(--plum);
+  display:inline-block;animation:numo-spin .7s linear infinite}
+.numo-page .numo-done__go{margin-top:22px}
+@keyframes numo-spin{to{transform:rotate(360deg)}}
+@keyframes numo-pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){
+  .numo-page .numo-done__check{animation:none}
+  .numo-page .numo-done__spin{animation-duration:1.6s}
+}
+.numo-page .welcome{font-size:30px;font-weight:800;color:#3a3340;margin-bottom:10px;letter-spacing:-.2px;text-align:center}
+.numo-page .welcome .wave{font-weight:400}
+.numo-page .welcome-sub{font-size:15.5px;color:var(--plum-strong);font-weight:500;margin-bottom:26px;text-align:center}
+
+.numo-page .field{margin-bottom:16px}
+.numo-page .field--email{margin:0 0 30px}
+.numo-page .field__label-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.numo-page .field__label{font-size:14.5px;font-weight:700;color:#46414f;white-space:nowrap}
+.numo-page .field__link{font-size:13.5px;font-weight:600;color:var(--plum);text-decoration:none}
+.numo-page .field__link:hover{text-decoration:underline}
+.numo-page .input{position:relative;display:flex;align-items:center}
+.numo-page .input>svg.lead{position:absolute;inset-inline-start:18px;width:19px;height:19px;color:#a7a2b0;pointer-events:none}
+.numo-page .input input{
+  width:100%;height:54px;border:1.5px solid var(--field-border);border-radius:var(--radius-field);
+  background:#fff;padding-inline-start:50px;padding-inline-end:18px;
+  font-family:inherit;font-size:15px;color:var(--ink);transition:.16s}
+.numo-page .input input::placeholder{color:#aaa5b2;font-weight:500}
+.numo-page .input input::-ms-reveal,.numo-page .input input::-ms-clear{display:none}
+.numo-page .input input:focus{outline:none;border-color:var(--field-border-focus);box-shadow:0 0 0 4px rgba(42,91,200,.1)}
+.numo-page .input .toggle-eye{position:absolute;inset-inline-end:16px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;color:#a7a2b0;background:none;border:none;cursor:pointer}
+.numo-page .input .toggle-eye:hover{color:var(--plum)}
+.numo-page .input.has-trail input{padding-inline-end:46px}
+
+.numo-page .remember{display:flex;align-items:center;gap:10px;margin:4px 0 18px;cursor:pointer;user-select:none;justify-content:flex-end}
+.numo-page .remember input{position:absolute;opacity:0;pointer-events:none}
+.numo-page .remember .box{width:19px;height:19px;border:1.6px solid #cfc9d8;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:.15s;background:#fff;flex:none}
+.numo-page .remember .box svg{width:13px;height:13px;color:#fff;opacity:0;transform:scale(.6);transition:.15s}
+.numo-page .remember input:checked + .box{background:var(--plum);border-color:var(--plum)}
+.numo-page .remember input:checked + .box svg{opacity:1;transform:scale(1)}
+.numo-page .remember span{font-size:14.5px;color:#55505f;font-weight:600}
+
+.numo-page .btn{width:100%;height:56px;border-radius:var(--radius-field);border:none;cursor:pointer;
+  font-family:inherit;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;transition:.18s;text-decoration:none}
+.numo-page .btn svg{width:19px;height:19px;flex:none}
+.numo-page .btn .label{white-space:nowrap}
+.numo-page .btn--primary{background:var(--plum-strong);color:#fff;box-shadow:0 14px 28px -14px rgba(42,91,200,.7)}
+.numo-page .btn--primary:hover{background:var(--plum-dark);transform:translateY(-1px);box-shadow:0 18px 32px -14px rgba(42,91,200,.8)}
+.numo-page .btn--primary:active{transform:translateY(0)}
+.numo-page .btn--ghost{background:#fff;color:#4a4654;border:1.5px solid var(--field-border);margin-top:0}
+.numo-page .btn--ghost:hover{border-color:var(--field-border-focus);color:var(--plum);background:#fdfbfe}
+.numo-page .btn + .btn{margin-top:12px}
+/* Odoo prepends a single <i class="fa fa-spin"> spinner on submit */
+.numo-page .btn .fa-spin{margin-inline-end:8px}
+
+.numo-page .divider{display:flex;align-items:center;gap:16px;margin:16px 0}
+.numo-page .divider::before,.numo-page .divider::after{content:"";height:1px;flex:1;background:var(--line)}
+.numo-page .divider span{font-size:13.5px;font-weight:600;color:var(--muted)}
+
+.numo-page .split-line{height:1px;background:var(--line);margin:24px 0 18px}
+
+.numo-page .trust{display:grid;grid-template-columns:repeat(3,1fr)}
+.numo-page .trust__item{display:flex;align-items:center;gap:11px;justify-content:center}
+.numo-page .trust__icon{flex:none;display:flex;align-items:center;justify-content:center;color:var(--plum)}
+.numo-page .trust__icon svg{width:26px;height:26px}
+.numo-page .trust__txt{display:flex;flex-direction:column;line-height:1.35}
+.numo-page .trust__t{font-size:14px;font-weight:700;color:var(--plum-strong)}
+.numo-page .trust__s{font-size:11px;color:var(--muted);font-weight:500;max-width:11em}
+
+/* ---------- Odoo error/success alert ---------- */
+.numo-page .numo-alert{border-radius:10px;padding:11px 14px;font-size:14px;font-weight:600;margin-bottom:18px}
+.numo-page .numo-alert.alert-danger{background:#fdecef;border:1px solid #f5c2cb;color:#b3324b}
+.numo-page .numo-alert.alert-success{background:#eaf7ee;border:1px solid #bfe6cb;color:#2e7d4f}
+
+/* ---------- footer ---------- */
+.numo-page .footer{text-align:center;margin-top:18px;font-size:15.5px;color:#8b8794;font-weight:600}
+
+/* ---------- responsive ---------- */
+@media(max-width:980px){
+  .numo-page .card{grid-template-columns:1fr}
+  .numo-page .hero{display:none}
+  .numo-page .form-wrap{padding:46px 30px}
+  /* hide trust badges + their divider on mobile (cramped/clipped) */
+  .numo-page .trust,.numo-page .split-line{display:none}
+  /* collapse the centre nav links like the home header does */
+  .numo-page .nav__links{display:none}
+  .numo-page .nav__in{padding:0 24px}
+}
+
+/*rtl:end:ignore*/

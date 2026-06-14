@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Strip the native centred card: render auth content full-bleed.
+         priority < 20 so this applies to the BASE web.login_layout BEFORE the
+         website module (priority 20) replaces the frontend_layout call. That
+         keeps `website` installable; the wrapper is also neutralised in CSS
+         (body:has(.numo-page) …) so the page is full-bleed either way. -->
+    <template id="numo_login_layout" inherit_id="web.login_layout"
+              name="numo Login Layout" priority="10">
+        <xpath expr="//div[hasclass('container')]" position="replace">
+            <t t-out="0"/>
+        </xpath>
+    </template>
+
+    <!--
+        ============================================================
+        SINGLE SHARED NAVBAR — the one header for every page.
+        ============================================================
+        This is the ONE source of truth for the site nav. It is used by:
+          • the homepage  — controllers/main.py renders this template to a
+                            string and injects it into the static home.html
+                            (at the <!-* NUMO_NAV *-> placeholder).
+          • login / reset — numo_shell t-calls it (below).
+          • future pages  — any QWeb page can <t t-call="numo_website.numo_nav"/>.
+        Optional context vars:
+          ar         bool  Arabic? (home injects ar=True; auth pages pass their lang)
+          lang_href  str   if set → the language pill is a server-reload link
+                           (auth pages); otherwise it renders the client-side
+                           toggle button used by the static homepage (#langBtn).
+        The data-i18n attributes let the homepage's client-side toggle keep
+        translating the nav; auth pages render the right language server-side.
+    -->
+    <template id="numo_nav" name="numo shared navbar">
+        <!-- Language + every href derive from request.lang (the website URL
+             prefix): English is the default (no prefix), Arabic is /ar. So the
+             nav always matches the page language, links keep the same language,
+             and the pill switches the WHOLE page to the other language's URL. -->
+        <t t-set="_lang" t-value="request.lang"/>
+        <t t-set="ar" t-value="bool(_lang) and (_lang.code or '').startswith('ar')"/>
+        <t t-set="prefix" t-value="'/ar' if ar else ''"/>
+        <t t-set="other_label" t-value="'English' if ar else 'العربية'"/>
+        <t t-set="other_prefix" t-value="'' if ar else '/ar'"/>
+        <!-- current path WITHOUT any lang prefix (the root keeps its /ar prefix
+             whereas sub-paths get it stripped, so handle both) -->
+        <t t-set="_raw" t-value="request.httprequest.path or '/'"/>
+        <t t-set="_base" t-value="(_raw[3:] or '/') if (_raw == '/ar' or _raw[:4] == '/ar/' or _raw == '/en' or _raw[:4] == '/en/') else _raw"/>
+        <t t-set="_qs" t-value="request.httprequest.query_string.decode('utf-8') if request.httprequest.query_string else ''"/>
+        <t t-set="lang_switch" t-value="(other_prefix or '/') if _base == '/' else other_prefix + _base + (('?' + _qs) if _qs else '')"/>
+        <!-- data-no-post-process: we build the /ar prefix ourselves, so opt out
+             of Odoo's website URL auto-localization (which would re-prepend the
+             CURRENT page's lang to root-relative URLs and break the language
+             switcher — e.g. force the English pill on an Arabic page back to /ar). -->
+        <header class="nav">
+            <div class="nav__in">
+                <a t-att-href="prefix + '/'" data-no-post-process="1" class="nav__logo" aria-label="numo GROUP">
+                    <img src="/numo_website/static/src/img/logo.png" alt="numo GROUP"
+                         width="142" height="50" fetchpriority="high"/>
+                </a>
+                <nav class="nav__links">
+                    <a t-att-href="prefix + '/#solutions'" data-no-post-process="1" data-i18n="navSolutions"><t t-if="ar">الحلول</t><t t-else="">Solutions</t></a>
+                    <a t-att-href="prefix + '/#awards'" data-no-post-process="1" data-i18n="navAwards"><t t-if="ar">الإعتمادات</t><t t-else="">Accreditations</t></a>
+                    <a t-att-href="prefix + '/#customers'" data-no-post-process="1" data-i18n="navCustomers"><t t-if="ar">العملاء</t><t t-else="">Customers</t></a>
+                </nav>
+                <div class="nav__right">
+                    <!-- language pill → same page in the other language (switches the URL) -->
+                    <a t-att-href="lang_switch" data-no-post-process="1" class="lang-toggle">
+                        <svg class="globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15.5 0 18M12 3c-2.5 2.5-2.5 15.5 0 18"/></svg>
+                        <span t-esc="other_label"/>
+                    </a>
+                    <!-- nav_home (set by auth pages) → "Home"; otherwise "Sign in" -->
+                    <a t-if="nav_home" t-att-href="prefix + '/'" data-no-post-process="1" class="btn btn--primary btn--sm"><t t-if="ar">الرئيسية</t><t t-else="">Home</t></a>
+                    <a t-else="" t-att-href="prefix + '/web/login'" data-no-post-process="1" class="btn btn--primary btn--sm" data-i18n="navLogin"><t t-if="ar">تسجيل الدخول</t><t t-else="">Sign in</t></a>
+                </div>
+            </div>
+        </header>
+    </template>
+
+    <!--
+        Shared shell: top bar + hero + footer. The page-specific form is dropped
+        into the form panel via <t t-out="0"/>. Callers must set `ar`,
+        `other_code` and `other_label` before t-call (they propagate here).
+    -->
+    <template id="numo_shell" name="numo GROUP auth shell">
+        <div class="numo-page">
+            <link rel="stylesheet"
+                  href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"/>
+
+            <!-- the ONE shared navbar; nav_home → the CTA is "Home" on auth pages -->
+            <t t-call="numo_website.numo_nav">
+                <t t-set="nav_home" t-value="True"/>
+            </t>
+
+            <main class="card">
+                <section class="hero">
+                    <div class="hero__media">
+                        <div class="hero__scrim"/>
+                        <div class="hero__top">
+                            <h2 class="hero__title">
+                                <t t-if="ar">
+                                    <span class="hero__title-main">تمكين اليوم ،<br/>لأجل مستقبل أفضل</span>
+                                </t>
+                                <t t-else="">
+                                    <span class="hero__title-main">Empower today,<br/>for a better</span>
+                                    <span class="hero__title-big">tomorrow</span>
+                                </t>
+                            </h2>
+                            <div class="hero__rule"/>
+                            <p class="hero__lede" t-if="ar">نمو معك في رحلتك الأكاديمية والمهنية، لنصنع معًا مستقبلًا مليئًا بالفرص والإنجازات.</p>
+                            <p class="hero__lede" t-else="">NUMO is behind you on your academic and professional journey, building your future together.</p>
+                        </div>
+                        <div class="hero__bottom">
+                            <blockquote class="quote">
+                                <span class="quote__mark quote__mark--top">”</span>
+                                <span t-if="ar">التعلم هو المفتاح الذهبي للحرية. استثمر في نفسك اليوم. لتحصد نجاح الغد.</span>
+                                <span t-else="">Education is the golden key to freedom. Invest in yourself today to reap tomorrow's success.</span>
+                                <span class="quote__mark quote__mark--bottom">„</span>
+                            </blockquote>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="form-wrap">
+                    <t t-out="0"/>
+                </section>
+            </main>
+
+            <footer class="footer"><t t-if="ar">جميع الحقوق محفوظة © 2026 مجموعة نمو</t><t t-else="">All rights reserved © 2026 Numo Group</t></footer>
+        </div>
+    </template>
+
+    <!-- Reusable trust badges (shared by login + reset). -->
+    <template id="numo_trust" name="numo trust badges">
+        <div class="split-line"/>
+        <div class="trust">
+            <div class="trust__item">
+                <div class="trust__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l7 3v5c0 4.5-3 7.8-7 9-4-1.2-7-4.5-7-9V6l7-3Z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg></div>
+                <div class="trust__txt">
+                    <span class="trust__t"><t t-if="ar">بيئة آمنة</t><t t-else="">Secure environment</t></span>
+                    <span class="trust__s"><t t-if="ar">حماية بياناتك بأعلى المعايير</t><t t-else="">Top-standard data security</t></span>
+                </div>
+            </div>
+            <div class="trust__item">
+                <div class="trust__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="3" y="13" width="4" height="6" rx="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5"/><path d="M20 19a3 3 0 0 1-3 3h-2"/></svg></div>
+                <div class="trust__txt">
+                    <span class="trust__t"><t t-if="ar">دعم مستمر</t><t t-else="">Always-on support</t></span>
+                    <span class="trust__s"><t t-if="ar">فريقنا جاهز لمساعدتك في أي وقت</t><t t-else="">Ready to help anytime</t></span>
+                </div>
+            </div>
+            <div class="trust__item">
+                <div class="trust__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="9" r="5.5"/><path d="M9 13.5 7.5 21 12 18.5 16.5 21 15 13.5"/></svg></div>
+                <div class="trust__txt">
+                    <span class="trust__t"><t t-if="ar">تجربة موثوقة</t><t t-else="">Trusted experience</t></span>
+                    <span class="trust__s"><t t-if="ar">موثوق من آلاف المستخدمين</t><t t-else="">Trusted by thousands of users</t></span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- ============ LOGIN ============ -->
+    <template id="numo_login" inherit_id="web.login" name="numo Login" priority="100">
+        <xpath expr="//owl-component[@name='web.user_switch']" position="replace"/>
+        <xpath expr="//form[contains(@t-attf-class, 'oe_login_form')]" position="replace">
+            <t t-set="ar" t-value="(request.context.get('lang') or '').startswith('ar')"/>
+            <t t-set="other_code" t-value="'en_US' if ar else 'ar_001'"/>
+            <t t-set="other_label" t-value="'English' if ar else 'العربية'"/>
+
+            <t t-call="numo_website.numo_shell">
+                <form class="form-inner oe_login_form" role="form" method="post"
+                      t-attf-action="/web/login{{ '?debug' if debug else '' }}"
+                      onsubmit="this.action = '/web/login' + location.hash"
+                      data-captcha="login">
+
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                    <h1 class="welcome"><span class="wave">👋</span> <span t-if="ar">مرحبًا بك من جديد</span><span t-else="">Welcome back</span></h1>
+                    <p class="welcome-sub" t-if="ar">نسعد بعودتك! يرجى تسجيل الدخول للمتابعة.</p>
+                    <p class="welcome-sub" t-else="">Great to see you again! Please sign in to continue.</p>
+
+                    <p t-if="error" class="numo-alert alert alert-danger" role="alert">
+                        <t t-if="ar and 'login/password' in (error or '').lower()">بيانات الدخول غير صحيحة، يرجى المحاولة مرة أخرى.</t>
+                        <t t-else=""><t t-esc="error"/></t>
+                    </p>
+                    <p t-if="message" class="numo-alert alert alert-success" role="status"><t t-esc="message"/></p>
+
+                    <div class="field field--email">
+                        <div class="field__label-row">
+                            <label class="field__label" for="login"><t t-if="ar">البريد الإلكتروني</t><t t-else="">Email</t></label>
+                        </div>
+                        <div class="input">
+                            <svg class="lead" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>
+                            <input type="text" name="login" id="login" t-att-value="login"
+                                   autofocus="autofocus" autocapitalize="off" autocomplete="username"
+                                   required="required" t-att-placeholder="'أدخل بريدك الإلكتروني' if ar else 'Enter your email'"/>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field__label-row">
+                            <label class="field__label" for="password"><t t-if="ar">كلمة المرور</t><t t-else="">Password</t></label>
+                            <a href="/web/reset_password" class="field__link"><t t-if="ar">نسيت كلمة المرور؟</t><t t-else="">Forgot password?</t></a>
+                        </div>
+                        <div class="input has-trail">
+                            <svg class="lead" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="10.5" width="16" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>
+                            <input type="password" name="password" id="password"
+                                   required="required" autocomplete="current-password" maxlength="4096"
+                                   t-att-placeholder="'أدخل كلمة المرور' if ar else 'Enter your password'"/>
+                            <button type="button" class="toggle-eye"
+                                    t-att-aria-label="'إظهار كلمة المرور' if ar else 'Show password'"
+                                    onclick="var i=this.parentNode.querySelector('input'); i.type = i.type==='password' ? 'text' : 'password';">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="webauthn_response"/>
+                    <input type="hidden" name="type" value="password"/>
+                    <input type="hidden" name="redirect" t-att-value="redirect"/>
+
+                    <button class="btn btn--primary" type="submit">
+                        <span class="label"><t t-if="ar">تسجيل الدخول</t><t t-else="">Sign in</t></span>
+                        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+                    </button>
+
+                    <div class="divider"><span><t t-if="ar">أو</t><t t-else="">OR</t></span></div>
+
+                    <a href="#" class="btn btn--ghost passkey_login_link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3M21 21v.01M17 21h.01M21 17v.01"/></svg>
+                        <span class="label"><t t-if="ar">استخدام مفتاح المرور</t><t t-else="">Use a passkey</t></span>
+                    </a>
+
+                    <t t-call="numo_website.numo_trust"/>
+                </form>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- ============ RESET PASSWORD ============ -->
+    <template id="numo_reset_password" inherit_id="auth_signup.reset_password"
+              name="numo Reset Password" priority="100">
+        <xpath expr="//t[@t-call='web.login_layout']" position="replace">
+            <t t-call="web.login_layout">
+                <t t-set="ar" t-value="(request.context.get('lang') or '').startswith('ar')"/>
+                <t t-set="other_code" t-value="'en_US' if ar else 'ar_001'"/>
+                <t t-set="other_label" t-value="'English' if ar else 'العربية'"/>
+
+                <t t-call="numo_website.numo_shell">
+
+                    <!-- success / confirmation state -->
+                    <div t-if="message" class="form-inner">
+                        <!-- token present => the password was actually reset (this
+                             page only shows on the MFA fallback; normally the
+                             controller logs the user in and redirects). Without a
+                             token it's the "we emailed you a link" confirmation. -->
+                        <t t-if="token">
+                            <h1 class="welcome"><span t-if="ar">تم تغيير كلمة المرور</span><span t-else="">Password updated</span></h1>
+                            <p class="numo-alert alert alert-success" role="status">
+                                <t t-if="ar">تم تغيير كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول.</t>
+                                <t t-else="">Your password has been reset successfully. You can now sign in.</t>
+                            </p>
+                        </t>
+                        <t t-else="">
+                            <h1 class="welcome"><span t-if="ar">تحقق من بريدك</span><span t-else="">Check your inbox</span></h1>
+                            <p class="numo-alert alert alert-success" role="status">
+                                <t t-if="ar">تم إرسال تعليمات إعادة تعيين كلمة المرور إلى بريدك الإلكتروني.</t>
+                                <t t-else="">Password reset instructions have been sent to your email address.</t>
+                            </p>
+                        </t>
+                        <a href="/web/login" class="btn btn--ghost">
+                            <span class="label"><t t-if="ar">العودة لتسجيل الدخول</t><t t-else="">Back to login</t></span>
+                        </a>
+                        <t t-call="numo_website.numo_trust"/>
+                    </div>
+
+                    <!-- form state -->
+                    <form t-if="not message" class="form-inner oe_reset_password_form"
+                          role="form" method="post" data-captcha="password_reset">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                        <h1 class="welcome"><span class="wave">🔒</span> <span t-if="ar">إعادة تعيين كلمة المرور</span><span t-else="">Reset your password</span></h1>
+                        <t t-if="token and not invalid_token">
+                            <p class="welcome-sub" t-if="ar">اختر كلمة مرور جديدة لحسابك.</p>
+                            <p class="welcome-sub" t-else="">Choose a new password for your account.</p>
+                        </t>
+                        <t t-else="">
+                            <p class="welcome-sub" t-if="ar">أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين.</p>
+                            <p class="welcome-sub" t-else="">Enter your email and we'll send you a reset link.</p>
+                        </t>
+
+                        <p t-if="error" class="numo-alert alert alert-danger" role="alert">
+                            <t t-if="invalid_token">
+                                <t t-if="ar">انتهت صلاحية رابط إعادة التعيين أو سبق استخدامه. أدخل بريدك الإلكتروني أدناه لطلب رابط جديد.</t>
+                                <t t-else="">This reset link has expired or was already used. Enter your email below to request a new one.</t>
+                            </t>
+                            <t t-else=""><t t-esc="error"/></t>
+                        </p>
+
+                        <!-- with a valid token: new password + confirm -->
+                        <t t-if="token and not invalid_token">
+                            <div class="field">
+                                <div class="field__label-row">
+                                    <label class="field__label" for="password"><t t-if="ar">كلمة المرور الجديدة</t><t t-else="">New password</t></label>
+                                </div>
+                                <div class="input has-trail">
+                                    <svg class="lead" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="10.5" width="16" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>
+                                    <input type="password" name="password" id="password" required="required"
+                                           autofocus="autofocus" t-att-placeholder="'أدخل كلمة المرور الجديدة' if ar else 'Enter a new password'"/>
+                                    <button type="button" class="toggle-eye"
+                                            onclick="var i=this.parentNode.querySelector('input'); i.type = i.type==='password' ? 'text' : 'password';">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="field__label-row">
+                                    <label class="field__label" for="confirm_password"><t t-if="ar">تأكيد كلمة المرور</t><t t-else="">Confirm password</t></label>
+                                </div>
+                                <div class="input has-trail">
+                                    <svg class="lead" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="10.5" width="16" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>
+                                    <input type="password" name="confirm_password" id="confirm_password" required="required"
+                                           t-att-placeholder="'أعد إدخال كلمة المرور' if ar else 'Re-enter the password'"/>
+                                    <button type="button" class="toggle-eye"
+                                            onclick="var i=this.parentNode.querySelector('input'); i.type = i.type==='password' ? 'text' : 'password';">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </t>
+
+                        <!-- no token (or an invalid/expired one): email to request a new link -->
+                        <t t-if="not token or invalid_token">
+                            <div class="field">
+                                <div class="field__label-row">
+                                    <label class="field__label" for="login"><t t-if="ar">البريد الإلكتروني</t><t t-else="">Email</t></label>
+                                </div>
+                                <div class="input">
+                                    <svg class="lead" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>
+                                    <input type="text" name="login" id="login" t-att-value="login"
+                                           autofocus="autofocus" autocapitalize="off" required="required"
+                                           t-att-placeholder="'أدخل بريدك الإلكتروني' if ar else 'Enter your email'"/>
+                                </div>
+                            </div>
+                        </t>
+
+                        <input type="hidden" name="redirect" t-att-value="redirect"/>
+                        <!-- drop an invalid/expired token so resubmit goes through the
+                             "email me a new link" branch instead of failing again -->
+                        <input type="hidden" name="token" t-att-value="token if not invalid_token else ''"/>
+
+                        <button class="btn btn--primary" type="submit">
+                            <span class="label">
+                                <t t-if="token and not invalid_token"><t t-if="ar">إعادة تعيين كلمة المرور</t><t t-else="">Reset password</t></t>
+                                <t t-else=""><t t-if="ar">إرسال رابط إعادة التعيين</t><t t-else="">Send reset link</t></t>
+                            </span>
+                        </button>
+
+                        <a href="/web/login" class="btn btn--ghost">
+                            <span class="label"><t t-if="ar">العودة لتسجيل الدخول</t><t t-else="">Back to login</t></span>
+                        </a>
+
+                        <t t-call="numo_website.numo_trust"/>
+                    </form>
+                </t>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- ============ RESET DONE (success interstitial) ============
+         Rendered by NumoLoginHome.web_auth_reset_password after a successful
+         token reset + auto-login: shows a "password changed" confirmation, then
+         forwards to the backend dashboard. `redirect` is a sanitised local path. -->
+    <template id="numo_reset_done" name="numo password reset done">
+        <t t-call="web.login_layout">
+            <t t-set="ar" t-value="(request.context.get('lang') or '').startswith('ar')"/>
+            <t t-set="other_code" t-value="'en_US' if ar else 'ar_001'"/>
+            <t t-set="other_label" t-value="'English' if ar else 'العربية'"/>
+
+            <t t-call="numo_website.numo_shell">
+                <div class="form-inner numo-done">
+                    <div class="numo-done__check" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="m8 12.5 2.5 2.5 5.5-5.5"/></svg>
+                    </div>
+                    <h1 class="welcome"><t t-if="ar">تم تغيير كلمة المرور بنجاح</t><t t-else="">Password changed successfully</t></h1>
+                    <p class="welcome-sub numo-done__sub">
+                        <span class="numo-done__spin" aria-hidden="true"></span>
+                        <t t-if="ar">جارٍ تحويلك إلى لوحة التحكم…</t><t t-else="">Redirecting you to your dashboard…</t>
+                    </p>
+                    <!-- The auto-forward is done with an HTTP `Refresh` response
+                         header (set in the controller). Website-rendered pages
+                         strip inline <script>, so JS can't be relied on here.
+                         This link is the manual fallback. -->
+                    <a t-att-href="redirect" class="btn btn--primary numo-done__go">
+                        <span class="label"><t t-if="ar">المتابعة الآن</t><t t-else="">Continue now</t></span>
+                        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+                    </a>
+                    <t t-call="numo_website.numo_trust"/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>
