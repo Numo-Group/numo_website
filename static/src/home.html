@@ -584,10 +584,12 @@ function applyLang(lang){
     if(HTML_KEYS.has(k)) el.innerHTML = t[k]; else el.textContent = t[k];
   });
 }
-// Language follows the URL prefix set by the server (/ar → Arabic, otherwise
-// English). The language pill in the nav is a server-rendered link that points
-// to the same page in the other language, so switching just navigates there.
-applyLang(/^\/ar(\/|$)/.test(location.pathname) ? "ar" : "en");
+// The server resolves the language (from request.lang / the URL prefix, which
+// depends on the site's DEFAULT language) and stamps it onto <html data-lang>.
+// Trust that instead of re-guessing from the path, so the body always matches
+// the server-rendered nav regardless of which language is the site default.
+// The nav pill is a server-rendered link to the same page in the other language.
+applyLang(html.getAttribute("data-lang") === "en" ? "en" : "ar");
 
 /* ---- scroll reveal ---- */
 (function(){

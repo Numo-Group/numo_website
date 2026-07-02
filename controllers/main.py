@@ -14,6 +14,11 @@ _CACHE = {}
 
 _NAV_PLACEHOLDER = "<!--NUMO_NAV-->"
 
+# home.html ships as Arabic; we rewrite the opening <html> tag to the language
+# the server actually resolved so the client-side toggle trusts it (see below).
+_HTML_OPEN_AR = '<html lang="ar" dir="rtl" data-lang="ar">'
+_HTML_OPEN_EN = '<html lang="en" dir="ltr" data-lang="en">'
+
 
 def _home_html():
     """Serve the static homepage with the shared navbar spliced in.
@@ -36,15 +41,19 @@ def _home_html():
 
     composed = _CACHE.get(key)
     if composed is None:
-        if _NAV_PLACEHOLDER in raw:
+        # Stamp the resolved language onto <html> so the client-side toggle in
+        # home.html can trust it, instead of re-guessing from the URL path
+        # (which breaks when Arabic — not English — is the site default).
+        body = raw if is_ar else raw.replace(_HTML_OPEN_AR, _HTML_OPEN_EN, 1)
+        if _NAV_PLACEHOLDER in body:
             try:
                 # numo_nav derives language + hrefs from request.lang (URL prefix)
                 nav = request.env["ir.qweb"]._render("numo_website.numo_nav", {})
-                composed = raw.replace(_NAV_PLACEHOLDER, str(nav))
+                composed = body.replace(_NAV_PLACEHOLDER, str(nav))
             except Exception:
-                composed = raw.replace(_NAV_PLACEHOLDER, "")  # never break the page
+                composed = body.replace(_NAV_PLACEHOLDER, "")  # never break the page
         else:
-            composed = raw
+            composed = body
         _CACHE[key] = composed
     return composed
 

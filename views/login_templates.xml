@@ -33,18 +33,27 @@
     -->
     <template id="numo_nav" name="numo shared navbar">
         <!-- Language + every href derive from request.lang (the website URL
-             prefix): English is the default (no prefix), Arabic is /ar. So the
-             nav always matches the page language, links keep the same language,
-             and the pill switches the WHOLE page to the other language's URL. -->
+             prefix). We do NOT hardcode which language owns the prefix-less
+             root: Odoo serves the site's DEFAULT language at "/" and every other
+             language under "/<url_code>". Read the default + url_codes at render
+             time so this works whether the site default is Arabic OR English
+             (local default is en, staging default is ar). Falls back to the old
+             en=''/ar='/ar' mapping when there is no website (e.g. bare routes). -->
         <t t-set="_lang" t-value="request.lang"/>
         <t t-set="ar" t-value="bool(_lang) and (_lang.code or '').startswith('ar')"/>
-        <t t-set="prefix" t-value="'/ar' if ar else ''"/>
+        <!-- request.lang is a lightweight LangData (only .code is safe); the real
+             res.lang records (with .url_code) live on the website. Match by code. -->
+        <t t-set="_web" t-value="request.website"/>
+        <t t-set="_default" t-value="_web.default_lang_id if _web else False"/>
+        <t t-set="_cur" t-value="_web.language_ids.filtered(lambda l: l.code == _lang.code)[:1] if (_web and _lang) else False"/>
+        <t t-set="_other" t-value="_web.language_ids.filtered(lambda l: l.code != _lang.code)[:1] if (_web and _lang) else False"/>
+        <!-- prefix Odoo uses for a lang: '' for the site default, /url_code otherwise -->
+        <t t-set="prefix" t-value="('' if (_default and _cur.code == _default.code) else ('/' + _cur.url_code)) if _cur else ('/ar' if ar else '')"/>
+        <t t-set="other_prefix" t-value="('' if (_default and _other.code == _default.code) else ('/' + _other.url_code)) if _other else ('' if ar else '/ar')"/>
         <t t-set="other_label" t-value="'English' if ar else 'العربية'"/>
-        <t t-set="other_prefix" t-value="'' if ar else '/ar'"/>
-        <!-- current path WITHOUT any lang prefix (the root keeps its /ar prefix
-             whereas sub-paths get it stripped, so handle both) -->
+        <!-- current path WITHOUT its own lang prefix, so we can swap in the other -->
         <t t-set="_raw" t-value="request.httprequest.path or '/'"/>
-        <t t-set="_base" t-value="(_raw[3:] or '/') if (_raw == '/ar' or _raw[:4] == '/ar/' or _raw == '/en' or _raw[:4] == '/en/') else _raw"/>
+        <t t-set="_base" t-value="(_raw.removeprefix(prefix) or '/') if (prefix and (_raw == prefix or _raw.startswith(prefix + '/'))) else _raw"/>
         <t t-set="_qs" t-value="request.httprequest.query_string.decode('utf-8') if request.httprequest.query_string else ''"/>
         <t t-set="lang_switch" t-value="(other_prefix or '/') if _base == '/' else other_prefix + _base + (('?' + _qs) if _qs else '')"/>
         <!-- data-no-post-process: we build the /ar prefix ourselves, so opt out
