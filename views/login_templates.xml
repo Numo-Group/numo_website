@@ -55,7 +55,14 @@
         <t t-set="_raw" t-value="request.httprequest.path or '/'"/>
         <t t-set="_base" t-value="(_raw.removeprefix(prefix) or '/') if (prefix and (_raw == prefix or _raw.startswith(prefix + '/'))) else _raw"/>
         <t t-set="_qs" t-value="request.httprequest.query_string.decode('utf-8') if request.httprequest.query_string else ''"/>
-        <t t-set="lang_switch" t-value="(other_prefix or '/') if _base == '/' else other_prefix + _base + (('?' + _qs) if _qs else '')"/>
+        <t t-set="other_code" t-value="_other.url_code if _other else ('en' if ar else 'ar')"/>
+        <t t-set="_target" t-value="(other_prefix or '/') if _base == '/' else other_prefix + _base + (('?' + _qs) if _qs else '')"/>
+        <!-- Route the switch through /website/lang/<url_code> so it SETS the
+             frontend_lang cookie before redirecting. A plain link to the other
+             language's URL gets bounced straight back by Odoo's language
+             negotiation when a frontend_lang cookie for the current language
+             already exists (the "stuck on one language" bug). -->
+        <t t-set="lang_switch" t-value="('/website/lang/' + other_code + '?r=' + quote_plus(_target)) if (_web and _other) else _target"/>
         <!-- data-no-post-process: we build the /ar prefix ourselves, so opt out
              of Odoo's website URL auto-localization (which would re-prepend the
              CURRENT page's lang to root-relative URLs and break the language
