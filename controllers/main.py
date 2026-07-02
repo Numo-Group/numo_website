@@ -19,6 +19,22 @@ _NAV_PLACEHOLDER = "<!--NUMO_NAV-->"
 _HTML_OPEN_AR = '<html lang="ar" dir="rtl" data-lang="ar">'
 _HTML_OPEN_EN = '<html lang="en" dir="ltr" data-lang="en">'
 
+# Odoo shows a diagonal "Neutralized" watermark on backend/website pages when the
+# database is neutralized (staging/dev copies of prod). The homepage is served
+# verbatim and never renders through website.layout, so it misses that ribbon.
+# We inject an identical one ourselves. Style is copied verbatim from
+# website.neutralize_ribbon; text uses Odoo's own EN/AR strings. On a real
+# production DB, database.is_neutralized is falsy so nothing is injected.
+_NEUTRALIZE_RIBBON = (
+    '<span id="oe_neutralize_ribbon" style="'
+    "width:400px;top:55px;left:-100px;font-size:32px;text-align:center;"
+    "padding:10px;line-height:30px;color:#F0F0F0;transform:rotate(-45deg);"
+    "position:fixed;box-shadow:0 0 3px rgba(0,0,0,0.3);background:#D0442C;"
+    "opacity:0.6;pointer-events:none;text-transform:uppercase;z-index:9999;"
+    '">{text}</span>'
+)
+_NEUTRALIZE_TEXT = {"ar": "معطلة لأغراض الاختبار", "en": "Neutralized"}
+
 
 def _home_html():
     """Serve the static homepage with the shared navbar spliced in.
@@ -54,6 +70,16 @@ def _home_html():
                 composed = body.replace(_NAV_PLACEHOLDER, "")  # never break the page
         else:
             composed = body
+        # Splice in the neutralize ribbon (dev/staging only; see constant above).
+        try:
+            if request.env["ir.config_parameter"].sudo().get_param("database.is_neutralized"):
+                ribbon = _NEUTRALIZE_RIBBON.format(text=_NEUTRALIZE_TEXT[key])
+                composed = (
+                    composed.replace("</body>", ribbon + "</body>", 1)
+                    if "</body>" in composed else composed + ribbon
+                )
+        except Exception:
+            pass  # never break the page over a dev-only watermark
         _CACHE[key] = composed
     return composed
 
