@@ -243,6 +243,19 @@ html[dir="rtl"] .testimonial__nav svg{transform:scaleX(-1)}
 </head>
 <body>
 
+  <!-- ============ ANNOUNCEMENT BAR (hidden 2026-07-08 per request; uncomment block below to restore) ============
+  <div class="announce">
+    <div class="announce__in">
+      <span class="announce__chip" data-i18n="annChip">جديد</span>
+      <span class="announce__msg" data-i18n="annMsg">نُمو الآن، شركة مستقلّة مكرّسة بالكامل للتعليم والتعلّم في المملكة</span>
+      <a href="#story" class="announce__link">
+        <span data-i18n="annLink">اقرأ قصّتنا</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+  ============================================================================================== -->
+
   <!-- ============ NAV ============ -->
   <!-- The ONE shared navbar lives in views/login_templates.xml (numo_website.numo_nav).
        The controller renders that template and injects it here, so home/login/future
@@ -420,6 +433,35 @@ html[dir="rtl"] .testimonial__nav svg{transform:scaleX(-1)}
           <button class="testimonial__nav" aria-label="next">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
           </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CONFERENCE / EVENT ============ -->
+    <section class="conference">
+      <div class="wrap">
+        <div class="conference__card">
+          <div class="conference__text">
+            <div class="conference__year">
+              <h2 data-i18n="confH2">نلتقي في نُمو</h2>
+              <span class="year">2026</span>
+            </div>
+            <p class="conference__sub" data-i18n="confSub">انضمّ إلينا في مؤتمر المستخدمين السنوي، حيث يلتقي صنّاع مستقبل التعلّم الإلكتروني في المملكة.</p>
+            <div class="conference__meta">
+              <span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                <span data-i18n="confDate">13–15 يوليو 2026</span>
+              </span>
+              <span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.3-7-11a7 7 0 0 1 14 0c0 5.7-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                <span data-i18n="confVenue">الرياض، المملكة العربية السعودية</span>
+              </span>
+            </div>
+            <a href="#" class="btn btn--white btn--md" style="align-self:flex-start" data-i18n="confCta">احجز مقعدك</a>
+          </div>
+          <div class="conference__media">
+            <span class="slot-tag" data-i18n="confSlot">صورة المؤتمر · استبدلها لاحقاً</span>
+          </div>
         </div>
       </div>
     </section>
