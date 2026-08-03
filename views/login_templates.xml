@@ -475,19 +475,34 @@
                             <div class="field__label-row numo-totp__labelrow">
                                 <label class="field__label" for="totp_token"><t t-if="ar">كود المصادقة</t><t t-else="">Authentication code</t></label>
                             </div>
-                            <!-- NO maxlength and NO pattern, deliberately: authenticator
-                                 apps render the code as "123 456" and people paste it
-                                 that way. The controller strips whitespace before int(),
-                                 so a space is fine server-side — but maxlength="6" would
-                                 silently truncate that paste to "123 45" and
-                                 pattern="[0-9]*" would reject it outright. Native Odoo
-                                 has neither attribute either.
+                            <!-- The oninput sanitiser is what actually constrains this
+                                 field: inputmode="numeric" is only a mobile KEYBOARD
+                                 HINT and restricts nothing on desktop (letters went
+                                 straight in, spellcheck-underlined), and there is no
+                                 length cap without it.
+                                 It strips non-digits and caps at 6, which also keeps a
+                                 pasted "123 456" working (-> "123456") — the reason a
+                                 plain maxlength="6" is wrong here: it would truncate
+                                 that paste to "123 45". pattern="[0-9]*" is wrong for
+                                 the same reason: it rejects the paste outright.
+                                 Only reassigns when the value actually changed, so
+                                 typing does not shunt the caret to the end.
+                                 There is deliberately NO maxlength: it runs BEFORE the
+                                 sanitiser, so any cap truncates a paste of surrounding
+                                 text ("Your code is 123456" at maxlength=12 becomes
+                                 "Your code is" -> ""). The sanitiser is the only length
+                                 control, and it handles every case on its own.
+                                 spellcheck/autocorrect/autocapitalize off kills the red
+                                 squiggles and mobile auto-capitalisation.
                                  dir=ltr keeps the digits reading LTR on the RTL page;
                                  autocomplete=one-time-code enables OS/SMS autofill. -->
                             <div class="input numo-totp__code">
                                 <input type="text" id="totp_token" name="totp_token" dir="ltr"
                                        inputmode="numeric" autocomplete="one-time-code"
                                        autofocus="autofocus" required="required"
+                                       spellcheck="false"
+                                       autocorrect="off" autocapitalize="off"
+                                       oninput="var v = this.value.replace(/[^0-9]/g, '').slice(0, 6); if (v !== this.value) this.value = v;"
                                        placeholder="123456"/>
                             </div>
                             <p class="numo-totp__hint"><t t-if="ar">ستة أرقام</t><t t-else="">6 digits</t></p>

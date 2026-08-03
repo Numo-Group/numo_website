@@ -1,6 +1,6 @@
 {
     "name": "numo Group — Website & Login",
-    "version": "19.0.2.1.0",
+    "version": "19.0.2.1.1",
     "summary": "Branded bilingual (AR/EN) marketing homepage + login screen for numo Group",
     "description": """
 numo Group — Website & Login

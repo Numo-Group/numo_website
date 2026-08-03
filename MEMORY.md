@@ -2,7 +2,7 @@
 
 Newest first. Captured from the build/deploy session (2026-06-08 → 09).
 
-## 2026-08-03  2FA (TOTP) screen redesigned into the numo shell — v19.0.2.1.0
+## 2026-08-03  2FA (TOTP) screen redesigned into the numo shell — v19.0.2.1.0 → .1.1
 Reported from staging with a screenshot: `/web/login/totp` was still **stock Odoo** — purple button, bare Bootstrap `form-control`, an odoo.com "Learn More" link, and (because nothing on the page carried `.numo-page`) the **website marketing header + footer leaking in** around it. A 2FA sign-in therefore went numo → Odoo → numo.
 
 ### What changed
@@ -12,7 +12,7 @@ Reported from staging with a screenshot: `/web/login/totp` was still **stock Odo
 
 ### Load-bearing details (do not "simplify")
 - **`priority="100"`.** `auth_totp_mail` is installed and also inherits `auth_totp.auth_totp_form` at default priority 16, xpathing `//form/div[1]`, `//form[1]`, `//div[hasclass('border-top')]` — all inside the div we replace. Views apply in priority order, so at 100 its xpaths resolve first and only then get replaced. Lower it and **auth_totp_mail fails to load**. It is the only other view inheriting that template (checked across community + enterprise).
-- **No `maxlength`, no `pattern` on the code input.** Authenticator apps render `123 456` and people paste that; the controller strips whitespace before `int()`, but `maxlength="6"` truncates the paste to `123 45` and `pattern="[0-9]*"` rejects it. Native Odoo omits both too. Added `autocomplete="one-time-code"` (OS autofill, native omits it) + `dir="ltr"`.
+- **No `maxlength`, no `pattern` on the code input.** Authenticator apps render `123 456` and people paste that; the controller strips whitespace before `int()`, but `maxlength="6"` truncates the paste to `123 45` and `pattern="[0-9]*"` rejects it. Native Odoo omits both too. Added `autocomplete="one-time-code"` (OS autofill, native omits it) + `dir="ltr"`. ⚠️ **On its own this left the field with no constraint at all** (letters and unlimited length went in) — see the *Follow-up same day* section below, where an `oninput` sanitiser became the single length/charset control.
 - **`letter-spacing` needs a matching `text-indent`.** CSS appends the letter-space *after* the last glyph, so a centred code sits visibly left of centre. `.45em` / `.45em` cancels it (13.5px at 30px font).
 - **Selector must be `.input.numo-totp__code input` (0,3,1)**, not `.numo-totp__code input` (0,2,1) — the latter only *ties* `.numo-page .input input` and would win on source order alone.
 - **No controller override.** `/web/login/totp` is `website=True`, so it already tracks the URL/negotiated language; `_numo_sync_lang()` exists only because `/web/login` and `/web/reset_password` are *not* website routes. Verified: in one browser, login and 2FA render the same language.
@@ -32,8 +32,16 @@ Reported from staging with a screenshot: `/web/login/totp` was still **stock Odo
 - `Page.captureScreenshot(captureBeyondViewport=True)` frames the **wrong horizontal slice on an RTL page** — it looks like catastrophic overflow. Viewport-only capture (plus `scrollWidth` measurement) showed the layout is clean.
 - Reading `getComputedStyle` immediately after toggling the checkbox reports the **mid-transition** value (`.box` has `transition:.15s`) — a false failure. Settle ~400ms first.
 
+### Follow-up same day — code field accepted letters and had no length cap (v19.0.2.1.1)
+Two defects reported with screenshots of the deployed page: **14 digits typed straight in** (no cap, overflowing the box) and **`zxczxczxc…` accepted**, spellcheck-underlined in red.
+- **Cause:** `inputmode="numeric"` is only a mobile **keyboard hint** — it restricts nothing on desktop. Having deliberately dropped `maxlength`/`pattern` (to protect a pasted `123 456`), nothing constrained the field at all. That protected the paste case and left everything else unbounded.
+- **Fix:** inline **`oninput` sanitiser** — `var v = this.value.replace(/[^0-9]/g,'').slice(0,6); if (v !== this.value) this.value = v;` — plus `spellcheck="false"`, `autocorrect="off"`, `autocapitalize="off"`. Inline handlers are already the pattern in this file (the password eye toggle uses `onclick`), and website pages only strip `<script>` **tags**, not handler attributes.
+- **`maxlength` stays absent, and that is now a tested decision.** A first pass added `maxlength="12"` as a no-JS backstop; it **failed a real case** — attributes cap the value *before* `oninput` runs, so pasting `"Your code is 123456 please"` was truncated to `"Your code is"` and sanitised to `""`. Dropped it: the sanitiser is the single length control, and a no-JS backstop is worthless on a page that needs the JS bundle anyway. Same reason `pattern="[0-9]*"` stays out (it rejects a spaced paste).
+- Only reassigns when the value actually changed, so typing valid digits does not shunt the caret to the end.
+- **Verified 22/22** with real CDP key events (`Input.insertText` per char = one input event per keystroke, like typing): `zxczxczxczxczxc` → `""`; the reported `23123123123123` → `231231`; `1a2b3c4d5e6f7g8h` → `123456`; pastes of `123 456` / `123-456` / `"  123456  "` / `"Your code is 123456 please"` all → `123456`; autofill-style programmatic set + `input` event sanitised; caret stays at index 3 after typing `123`; field still 64px/30px with `ls == indent == 13.5px` and 6 digits neither overflow nor scroll inside it. Then **26/26 functional re-run** — a real computed TOTP code still logs in, so the sanitiser did not break submission.
+
 ### Still open
-- **NOT deployed to staging/prod.** `stg-erp-001.numo.sa` (where the screenshot came from) still shows the stock page. Staging now has **6** pushed commits pending (the 5 listed below + this one); SCSS/QWeb → `-u numo_website` + restart.
+- **NOT deployed to staging/prod.** `stg-erp-001.numo.sa` still shows the stock page (the follow-up screenshots came from a neutralized DB — confirm which before assuming staging is current). Staging now has **7** pushed commits pending (the 5 listed below + the two from this session); SCSS/QWeb → `-u numo_website` + restart.
 
 ## 2026-07-08  Portal horizontal-overflow fix (SAR font canary) + hide homepage announce bar
 Session on a staging bug report (`/my/orders/164` — "huge empty space you can scroll"). Dev copy → synced to deployed copy → `web-numo-local` / `odoo19_local` / http://127.0.0.1:8169/. Verified with **Playwright (`channel:'chrome'`)** measuring `document.documentElement.scrollWidth - clientWidth` before reporting.
