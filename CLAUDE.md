@@ -26,6 +26,14 @@ Odoo 19 module (depends on **`website`**, **`auth_signup`**, **`auth_totp`**) wi
 - **Images** `static/src/img/`: `logo.png` (homepage nav) · **`login-logo.png`** (login nav — distinct file) · `hero.webp` (shared) · `hero-ltr.webp` (login LTR) · **`clients/` (31 logos)** · **`accreditations/` (11 logos)**. All resolve to `/numo_website/static/src/img/…`.
 
 ## Design / theme
+- ⚠️ **Directional glyphs need an explicit flip.** `login.scss` is entirely inside
+  `/*rtl:begin:ignore*/`, so **rtlcss mirrors nothing in this file** — layout is handled by
+  logical properties and hand-written `[dir="rtl"]` / `[dir="ltr"]` rules. The log-in arrow
+  therefore needs `[dir="rtl"] .numo-page .btn .ic{transform:scaleX(-1)}`, which covers all
+  three buttons that use it (`numo_login` Sign in, `numo_reset_done`, `numo_totp` Log in).
+  Scoped to **`.ic`** on purpose: non-directional button icons must NOT flip (the password
+  eye, the passkey glyph, the 2FA re-send envelope). Add `.ic` to any future arrow/chevron;
+  leave it off symmetric icons.
 - **Blue scheme matching `numo_login`** (`--plum-strong:#2A5BC8`, etc. — same blue tokens; names kept as `--plum*`). Two plum→blue gradient accent bands (Stats + CTA).
 - Sections: sticky nav · hero (+120 partners badge) · partners · stats · about · why-numo · CTA · footer.
 - **Container width matched to the login**: `--maxw:1466px`, gutters `40px` (so home and login align).

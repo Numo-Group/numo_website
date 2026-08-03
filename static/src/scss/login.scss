@@ -210,6 +210,12 @@ body:has(.numo-page) #wrapwrap, body:has(.numo-page) #wrapwrap > main{padding:0 
 .numo-page .btn{width:100%;height:56px;border-radius:var(--radius-field);border:none;cursor:pointer;
   font-family:inherit;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;transition:.18s;text-decoration:none}
 .numo-page .btn svg{width:19px;height:19px;flex:none}
+/* The log-in arrow is a DIRECTIONAL glyph, so it has to point the way the
+   language reads — right in LTR, left in RTL. This whole file sits inside
+   rtl:begin:ignore, so rtlcss will not mirror it for us and it needs saying
+   explicitly. Scoped to .ic so non-directional button icons are left alone
+   (the envelope on the 2FA "re-send code" button must NOT flip). */
+[dir="rtl"] .numo-page .btn .ic{transform:scaleX(-1)}
 .numo-page .btn .label{white-space:nowrap}
 .numo-page .btn--primary{background:var(--plum-strong);color:#fff;box-shadow:0 14px 28px -14px rgba(42,91,200,.7)}
 .numo-page .btn--primary:hover{background:var(--plum-dark);transform:translateY(-1px);box-shadow:0 18px 32px -14px rgba(42,91,200,.8)}

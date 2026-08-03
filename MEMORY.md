@@ -2,7 +2,7 @@
 
 Newest first. Captured from the build/deploy session (2026-06-08 → 09).
 
-## 2026-08-03  2FA (TOTP) screen redesigned into the numo shell — v19.0.2.1.0 → .1.1
+## 2026-08-03  2FA (TOTP) screen redesigned into the numo shell — v19.0.2.1.0 → .1.2
 Reported from staging with a screenshot: `/web/login/totp` was still **stock Odoo** — purple button, bare Bootstrap `form-control`, an odoo.com "Learn More" link, and (because nothing on the page carried `.numo-page`) the **website marketing header + footer leaking in** around it. A 2FA sign-in therefore went numo → Odoo → numo.
 
 ### What changed
@@ -40,8 +40,18 @@ Two defects reported with screenshots of the deployed page: **14 digits typed st
 - Only reassigns when the value actually changed, so typing valid digits does not shunt the caret to the end.
 - **Verified 22/22** with real CDP key events (`Input.insertText` per char = one input event per keystroke, like typing): `zxczxczxczxczxc` → `""`; the reported `23123123123123` → `231231`; `1a2b3c4d5e6f7g8h` → `123456`; pastes of `123 456` / `123-456` / `"  123456  "` / `"Your code is 123456 please"` all → `123456`; autofill-style programmatic set + `input` event sanitised; caret stays at index 3 after typing `123`; field still 64px/30px with `ls == indent == 13.5px` and 6 digits neither overflow nor scroll inside it. Then **26/26 functional re-run** — a real computed TOTP code still logs in, so the sanitiser did not break submission.
 
+### Follow-up 2 — log-in arrow was not mirrored in Arabic (v19.0.2.1.2)
+Reported from staging: the arrow beside **تسجيل الدخول** still pointed **right** in the RTL page. A log-in arrow is a **directional** glyph — it has to point the way the language reads.
+- **Cause:** the whole of `login.scss` sits inside `/*rtl:begin:ignore*/`, so **rtlcss mirrors nothing in this file** — every RTL difference is hand-written (`[dir="rtl"] .numo-page …`, already the convention at lines ~132-137). The arrow simply had no such rule, so it never flipped. Confirmed the ignore holds: the rule is byte-identical in `web.assets_frontend.css` and `web.assets_frontend.rtl.css`.
+- **Fix:** one rule — `[dir="rtl"] .numo-page .btn .ic{transform:scaleX(-1)}`.
+- **It was wrong on three buttons, not one.** The same arrow SVG appears in `numo_login` (Sign in, line ~238), `numo_reset_done` (line ~410) and `numo_totp` (line ~523), so the login page had the identical bug. One class-based rule fixes all three; fixing only the 2FA button would have left the login page inconsistent.
+- **Scoped to `.ic` deliberately** so non-directional button icons are untouched — verified `none` on the password eye-toggle and the passkey glyph, and the 2FA re-send **envelope** must not flip either. Any future arrow/chevron needs `.ic`; symmetric icons must not have it.
+- Targets the `svg`, not the button, so `.btn--primary:hover{transform:translateY(-1px)}` is unaffected (checked).
+- **Verified 14/14**: RTL 2FA + RTL login arrow = `matrix(-1, 0, 0, 1, 0, 0)` and sits on the reading-end (left of the label); LTR both = `none` and sits right of the label; non-`.ic` button icons all `none`; arrow still 19×19 inside the button; 0 console errors. Close-up screenshots confirm ← in Arabic, → in English.
+- ⚠️ **Test-selector trap:** `.numo-page .btn--primary` matches the **nav "الرئيسية" pill first** (`a.btn.btn--primary.btn--sm`, which has no icon) — a `querySelector` on it returns a button with no `svg.ic` and reads as "the fix didn't apply". Use `form button.btn--primary`.
+
 ### Still open
-- **NOT deployed to staging/prod.** `stg-erp-001.numo.sa` still shows the stock page (the follow-up screenshots came from a neutralized DB — confirm which before assuming staging is current). Staging now has **7** pushed commits pending (the 5 listed below + the two from this session); SCSS/QWeb → `-u numo_website` + restart.
+- **NOT deployed to staging/prod.** `stg-erp-001.numo.sa` still shows the stock page (the follow-up screenshots came from a neutralized DB — confirm which before assuming staging is current). Staging now has **9** pushed commits pending (the 5 listed below + the four from this session); SCSS/QWeb → `-u numo_website` + restart.
 
 ## 2026-07-08  Portal horizontal-overflow fix (SAR font canary) + hide homepage announce bar
 Session on a staging bug report (`/my/orders/164` — "huge empty space you can scroll"). Dev copy → synced to deployed copy → `web-numo-local` / `odoo19_local` / http://127.0.0.1:8169/. Verified with **Playwright (`channel:'chrome'`)** measuring `document.documentElement.scrollWidth - clientWidth` before reporting.
