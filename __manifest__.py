@@ -1,6 +1,6 @@
 {
     "name": "numo Group — Website & Login",
-    "version": "19.0.2.0.0",
+    "version": "19.0.2.1.0",
     "summary": "Branded bilingual (AR/EN) marketing homepage + login screen for numo Group",
     "description": """
 numo Group — Website & Login
@@ -16,6 +16,10 @@ English LTR) numo Group experience for the public site and backend auth:
   web.login / web.login_layout / auth_signup.reset_password while keeping
   Odoo's native authentication (real /web/login POST, csrf_token, redirect,
   passkey/WebAuthn, MFA, password reset) fully intact.
+* The two-factor step (/web/login/totp) is skinned into the same shell, with a
+  purpose-built six-digit code field, so a 2FA sign-in never drops the user onto
+  a stock Odoo screen mid-flow. Native TOTP auth (totp_token, remember /
+  trusted-device cookie, e-mailed codes, logout-cancel) is unchanged.
 
 Login/reset default to Arabic (RTL); users switch with the language pill,
 remembered in a cookie. Logical CSS properties mirror the layout for RTL/LTR.
@@ -26,7 +30,9 @@ remembered in a cookie. Logical CSS properties mirror the layout for RTL/LTR.
     "author": "Numo",
     "website": "https://numo.sa",
     "license": "LGPL-3",
-    "depends": ["website", "auth_signup"],
+    # auth_totp is required for the numo_totp view's inherit_id to resolve. It is
+    # a stock community module and is already installed on local, staging and prod.
+    "depends": ["website", "auth_signup", "auth_totp"],
     "data": [
         "views/login_templates.xml",
     ],

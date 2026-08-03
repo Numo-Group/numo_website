@@ -156,11 +156,14 @@ body:has(.numo-page) #wrapwrap, body:has(.numo-page) #wrapwrap > main{padding:0 
 
 /* ---------- reset-done success interstitial ---------- */
 .numo-page .numo-done{text-align:center}
-.numo-page .numo-done__check{width:74px;height:74px;margin:0 auto 22px;border-radius:50%;
+/* shared brand circle badge (reset-done check + 2FA shield) */
+.numo-page .numo-done__check,
+.numo-page .numo-totp__badge{width:74px;height:74px;margin:0 auto 22px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;color:#fff;
   background:linear-gradient(135deg,var(--plum),var(--plum-strong));
   box-shadow:0 14px 30px -10px rgba(42,91,200,.55);animation:numo-pop .45s cubic-bezier(.22,1.2,.4,1) both}
-.numo-page .numo-done__check svg{width:38px;height:38px}
+.numo-page .numo-done__check svg,
+.numo-page .numo-totp__badge svg{width:38px;height:38px}
 .numo-page .numo-done__sub{display:flex;align-items:center;justify-content:center;gap:9px}
 .numo-page .numo-done__spin{width:15px;height:15px;border-radius:50%;
   border:2px solid var(--plum-tint);border-top-color:var(--plum);
@@ -169,7 +172,8 @@ body:has(.numo-page) #wrapwrap, body:has(.numo-page) #wrapwrap > main{padding:0 
 @keyframes numo-spin{to{transform:rotate(360deg)}}
 @keyframes numo-pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
 @media(prefers-reduced-motion:reduce){
-  .numo-page .numo-done__check{animation:none}
+  .numo-page .numo-done__check,
+  .numo-page .numo-totp__badge{animation:none}
   .numo-page .numo-done__spin{animation-duration:1.6s}
 }
 .numo-page .welcome{font-size:30px;font-weight:800;color:#3a3340;margin-bottom:10px;letter-spacing:-.2px;text-align:center}
@@ -234,6 +238,33 @@ body:has(.numo-page) #wrapwrap, body:has(.numo-page) #wrapwrap > main{padding:0 
 .numo-page .numo-alert{border-radius:10px;padding:11px 14px;font-size:14px;font-weight:600;margin-bottom:18px}
 .numo-page .numo-alert.alert-danger{background:#fdecef;border:1px solid #f5c2cb;color:#b3324b}
 .numo-page .numo-alert.alert-success{background:#eaf7ee;border:1px solid #bfe6cb;color:#2e7d4f}
+
+/* ---------- two-factor authentication (TOTP) ---------- */
+.numo-page .numo-totp{text-align:center}
+/* the label row is a space-between flex row for the login's "forgot password?"
+   link; the 2FA screen has a single centred label */
+.numo-page .numo-totp__labelrow{justify-content:center}
+.numo-page .numo-totp__mail{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap}
+.numo-page .numo-totp__mail>svg{width:16px;height:16px;flex:none}
+.numo-page .numo-totp__addr{font-weight:700}
+/* the code field: big, centred, spaced digits. Selector is .input.numo-totp__code
+   (0,3,1) on purpose — `.numo-page .numo-totp__code input` only TIES
+   `.numo-page .input input` (0,2,1) and would win on source order alone. */
+.numo-page .input.numo-totp__code input{
+  height:64px;font-size:30px;font-weight:700;
+  /* letter-spacing appends space AFTER the last glyph, which pushes centred text
+     visibly off-centre; text-indent of the same size cancels it out */
+  letter-spacing:.45em;text-indent:.45em;text-align:center;
+  font-variant-numeric:tabular-nums;
+  /* reset the 50px inset the base rule leaves for a leading icon — there is none here */
+  padding-inline:18px}
+.numo-page .input.numo-totp__code input::placeholder{font-size:24px;font-weight:600;color:#c6c1cf}
+.numo-page .numo-totp__hint{margin-top:9px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.numo-page .numo-totp .remember{justify-content:center;margin:2px 0 20px}
+.numo-page .numo-totp__alt{margin-top:12px}
+.numo-page .numo-totp__cancel{width:100%;margin-top:14px;background:none;border:none;cursor:pointer;
+  font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);text-align:center}
+.numo-page .numo-totp__cancel:hover{color:var(--plum);text-decoration:underline}
 
 /* ---------- footer ---------- */
 .numo-page .footer{text-align:center;margin-top:18px;font-size:15.5px;color:#8b8794;font-weight:600}

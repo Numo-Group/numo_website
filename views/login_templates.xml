@@ -415,4 +415,123 @@
         </t>
     </template>
 
+    <!-- ============ TWO-FACTOR AUTHENTICATION (TOTP) ============
+         Reskins auth_totp.auth_totp_form into the shared numo auth shell, so the
+         2FA step stops rendering stock Odoo (purple button + leaked website
+         header/footer) between two branded numo screens.
+
+         ⚠ priority MUST stay above 16. auth_totp_mail (installed) also inherits
+         this template at the DEFAULT priority and xpaths onto //form/div[1],
+         //form[1] and //div[hasclass('border-top')] — all of which live inside
+         the div we replace. Views apply in priority order, so at 100 its xpaths
+         resolve against the native arch first and only then are they replaced.
+         Drop our priority below 16 and auth_totp_mail fails to load.
+
+         Native behaviour kept 1:1: action="" posts back to the current URL (so
+         ?redirect= survives), csrf_token, totp_token, remember -> trusted-device
+         cookie, and the separate logout POST behind Cancel.
+         Render context comes from auth_totp's web_totp: user, error, redirect. -->
+    <template id="numo_totp" inherit_id="auth_totp.auth_totp_form"
+              name="numo Two-Factor Authentication" priority="100">
+        <xpath expr="//div[hasclass('oe_login_form')]" position="replace">
+            <t t-set="ar" t-value="(request.context.get('lang') or '').startswith('ar')"/>
+            <t t-set="other_code" t-value="'en_US' if ar else 'ar_001'"/>
+            <t t-set="other_label" t-value="'English' if ar else 'العربية'"/>
+            <!-- _mfa_type() is defined on base's res_users, so this is safe whether
+                 or not auth_totp_mail is installed. 'totp' = authenticator app,
+                 'totp_mail' = code e-mailed to the user. -->
+            <t t-set="mfa" t-value="user._mfa_type() if user else 'totp'"/>
+
+            <t t-call="numo_website.numo_shell">
+                <div class="form-inner numo-totp">
+
+                    <div class="numo-totp__badge" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3l7 3v5c0 4.5-3 7.8-7 9-4-1.2-7-4.5-7-9V6l7-3Z"/><path d="m9.3 12.1 1.9 1.9 3.6-3.7"/></svg>
+                    </div>
+
+                    <h1 class="welcome"><t t-if="ar">المصادقة الثنائية</t><t t-else="">Two-factor authentication</t></h1>
+
+                    <p class="welcome-sub" t-if="mfa == 'totp_mail'">
+                        <span class="numo-totp__mail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>
+                            <t t-if="ar">أرسلنا رمزًا مكوّنًا من ستة أرقام إلى</t><t t-else="">We've sent a six-digit code to</t>
+                            <span class="numo-totp__addr" dir="ltr" t-out="user.email"/>
+                        </span>
+                    </p>
+                    <p class="welcome-sub" t-else="">
+                        <t t-if="ar">أدخل الرمز المكوّن من ستة أرقام من تطبيق المصادقة لديك.</t>
+                        <t t-else="">Enter the six-digit code from your authenticator app.</t>
+                    </p>
+
+                    <!-- Native failure strings go through _() and auth_totp/i18n/ar.po
+                         already translates them, so no hand-mapping here. -->
+                    <p t-if="error" class="numo-alert alert alert-danger" role="alert"><t t-esc="error"/></p>
+
+                    <form method="POST" action="">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <input type="hidden" name="redirect" t-att-value="redirect"/>
+
+                        <div class="field">
+                            <div class="field__label-row numo-totp__labelrow">
+                                <label class="field__label" for="totp_token"><t t-if="ar">كود المصادقة</t><t t-else="">Authentication code</t></label>
+                            </div>
+                            <!-- NO maxlength and NO pattern, deliberately: authenticator
+                                 apps render the code as "123 456" and people paste it
+                                 that way. The controller strips whitespace before int(),
+                                 so a space is fine server-side — but maxlength="6" would
+                                 silently truncate that paste to "123 45" and
+                                 pattern="[0-9]*" would reject it outright. Native Odoo
+                                 has neither attribute either.
+                                 dir=ltr keeps the digits reading LTR on the RTL page;
+                                 autocomplete=one-time-code enables OS/SMS autofill. -->
+                            <div class="input numo-totp__code">
+                                <input type="text" id="totp_token" name="totp_token" dir="ltr"
+                                       inputmode="numeric" autocomplete="one-time-code"
+                                       autofocus="autofocus" required="required"
+                                       placeholder="123456"/>
+                            </div>
+                            <p class="numo-totp__hint"><t t-if="ar">ستة أرقام</t><t t-else="">6 digits</t></p>
+                        </div>
+
+                        <!-- .remember was styled in login.scss from the start but never
+                             used by a template; this is its first consumer. The checkbox
+                             must stay the immediate previous sibling of span.box or the
+                             checked state (input:checked + .box) will not paint. -->
+                        <label class="remember" for="switch-remember">
+                            <input type="checkbox" name="remember" id="switch-remember" value="1"/>
+                            <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span>
+                            <span><t t-if="ar">عدم السؤال مجددًا على هذا الجهاز</t><t t-else="">Don't ask again on this device</t></span>
+                        </label>
+
+                        <button class="btn btn--primary" type="submit">
+                            <span class="label"><t t-if="ar">تسجيل الدخول</t><t t-else="">Log in</t></span>
+                            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+                        </button>
+                    </form>
+
+                    <!-- e-mailed code only: request a fresh one. In Odoo 19 the
+                         send_email input is vestigial — auth_totp_mail's controller
+                         re-sends on every render for a totp_mail user — so posting the
+                         page with an empty totp_token IS the re-send. Kept for parity. -->
+                    <form method="POST" action="" t-if="mfa == 'totp_mail'" class="numo-totp__alt">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <input type="hidden" name="send_email" value="1"/>
+                        <button class="btn btn--ghost" type="submit">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>
+                            <span class="label"><t t-if="ar">إعادة إرسال الرمز</t><t t-else="">Re-send code</t></span>
+                        </button>
+                    </form>
+
+                    <!-- Cancel drops the half-finished (pre_uid) session — native behaviour. -->
+                    <form method="POST" action="/web/session/logout">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <button type="submit" class="numo-totp__cancel"><t t-if="ar">إلغاء</t><t t-else="">Cancel</t></button>
+                    </form>
+
+                    <t t-call="numo_website.numo_trust"/>
+                </div>
+            </t>
+        </xpath>
+    </template>
+
 </odoo>

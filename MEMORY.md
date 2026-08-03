@@ -2,6 +2,39 @@
 
 Newest first. Captured from the build/deploy session (2026-06-08 → 09).
 
+## 2026-08-03  2FA (TOTP) screen redesigned into the numo shell — v19.0.2.1.0
+Reported from staging with a screenshot: `/web/login/totp` was still **stock Odoo** — purple button, bare Bootstrap `form-control`, an odoo.com "Learn More" link, and (because nothing on the page carried `.numo-page`) the **website marketing header + footer leaking in** around it. A 2FA sign-in therefore went numo → Odoo → numo.
+
+### What changed
+- **`views/login_templates.xml`** — new template **`numo_totp`** inheriting `auth_totp.auth_totp_form` at **`priority="100"`**, replacing `div.oe_login_form` with `numo_shell` + `<div class="form-inner numo-totp">` holding **three sibling forms** (code submit / re-send e-mail / logout-cancel — native has three too, and nested `<form>` is invalid HTML). Bilingual AR-RTL + EN off the same `ar` flag as `numo_login`. Branches on `user._mfa_type()` for the `totp_mail` variant (e-mail wording + address + "Re-send code"). Dropped Odoo's odoo.com docs link as off-brand.
+- **`static/src/scss/login.scss`** (+~30 lines, inside the existing `/*rtl:begin:ignore*/`) — `.numo-totp*` block; the brand circle badge reuses the `numo-done__check` rule via a comma list rather than duplicating it.
+- **`__manifest__.py`** — `auth_totp` added to `depends` (needed for `inherit_id`; stock community, already installed local/staging/prod), version `19.0.2.0.0` → **`19.0.2.1.0`**.
+
+### Load-bearing details (do not "simplify")
+- **`priority="100"`.** `auth_totp_mail` is installed and also inherits `auth_totp.auth_totp_form` at default priority 16, xpathing `//form/div[1]`, `//form[1]`, `//div[hasclass('border-top')]` — all inside the div we replace. Views apply in priority order, so at 100 its xpaths resolve first and only then get replaced. Lower it and **auth_totp_mail fails to load**. It is the only other view inheriting that template (checked across community + enterprise).
+- **No `maxlength`, no `pattern` on the code input.** Authenticator apps render `123 456` and people paste that; the controller strips whitespace before `int()`, but `maxlength="6"` truncates the paste to `123 45` and `pattern="[0-9]*"` rejects it. Native Odoo omits both too. Added `autocomplete="one-time-code"` (OS autofill, native omits it) + `dir="ltr"`.
+- **`letter-spacing` needs a matching `text-indent`.** CSS appends the letter-space *after* the last glyph, so a centred code sits visibly left of centre. `.45em` / `.45em` cancels it (13.5px at 30px font).
+- **Selector must be `.input.numo-totp__code input` (0,3,1)**, not `.numo-totp__code input` (0,2,1) — the latter only *ties* `.numo-page .input input` and would win on source order alone.
+- **No controller override.** `/web/login/totp` is `website=True`, so it already tracks the URL/negotiated language; `_numo_sync_lang()` exists only because `/web/login` and `/web/reset_password` are *not* website routes. Verified: in one browser, login and 2FA render the same language.
+
+### Verified on local (odoo19_local, container `web-numo-local`)
+- Combined `ir.ui.view` arch: apply order `auth_totp_mail(16) → numo_totp(100)`, `oe_login_form` and the odoo.com link gone, one `totp_token` input with no `maxlength`/`pattern`, 3 forms, remember input immediately followed by `span.box`.
+- **62/62 browser checks** (CDP, headless Chrome) across desktop-AR 1440×900, desktop-EN, mobile-AR 390×844: shell renders, website header/footer compute to `display:none`, badge 74px gradient circle, code field 64px/30px/700/centred with `ls == indent == 13.5px`, paste of `123 456` survives, submit is `rgb(42,91,200)` (not Odoo purple), remember box white→brand with the check appearing, hero/trust/nav-links hidden at 390, **no element crossing the viewport edge**, 0 exceptions, 0 console errors.
+- **26/26 functional** (curl + `odoo shell`, throwaway TOTP user, deleted after): login → 2FA redirect; wrong code re-renders 200 with the numo danger alert in Arabic (native `auth_totp/i18n/ar.po`, no hand-mapping); **a real computed TOTP code logs in** → 303 `/odoo` + `td_id` cookie + one `auth_totp.device` row; `totp_mail` branch shows the address (`dir=ltr`) + "Re-send code" + 3 csrf tokens; `/web/login` and `/web/reset_password` unregressed.
+- Real overflow measured properly: `documentElement.scrollWidth == innerWidth` (1440 and 390), `scrollLeft 0`. Only 1px item is Odoo's own `o_skip_to_content` skip link.
+
+### Harness gotchas that cost time (all mine, not the product's)
+- `subprocess.run(..., text=True)` enables **universal newlines**, so curl's `\r\n\r\n` header terminator arrives as `\n\n` — splitting on CRLF yields an **empty body**, and every POST then 400s on CSRF.
+- Hand-seeding a Netscape cookie jar (or passing a `Cookie:` header) makes curl **drop the server's `session_id`** → CSRF 400. Let curl own the jar; set language via `Accept-Language`.
+- curl writes httpOnly cookies as **`#HttpOnly_<domain>`**, so "skip lines starting with `#`" hides exactly `session_id` and `td_id`.
+- **A real browser User-Agent is required for the remember/trusted-device path**: stock `auth_totp` names the device with `user_agent.browser.capitalize()`, and curl's UA parses to `browser=None` → `AttributeError` → **500 after the 2FA check already succeeded**. Odoo bug, not ours.
+- The web worker **caches `ir.config_parameter`**, so flipping `auth_totp.policy` from `odoo shell` (to force `totp_mail`) is invisible until `docker restart`. Policy captured and restored afterwards; confirmed back to `False`.
+- `Page.captureScreenshot(captureBeyondViewport=True)` frames the **wrong horizontal slice on an RTL page** — it looks like catastrophic overflow. Viewport-only capture (plus `scrollWidth` measurement) showed the layout is clean.
+- Reading `getComputedStyle` immediately after toggling the checkbox reports the **mid-transition** value (`.box` has `transition:.15s`) — a false failure. Settle ~400ms first.
+
+### Still open
+- **NOT deployed to staging/prod.** `stg-erp-001.numo.sa` (where the screenshot came from) still shows the stock page. Staging now has **6** pushed commits pending (the 5 listed below + this one); SCSS/QWeb → `-u numo_website` + restart.
+
 ## 2026-07-08  Portal horizontal-overflow fix (SAR font canary) + hide homepage announce bar
 Session on a staging bug report (`/my/orders/164` — "huge empty space you can scroll"). Dev copy → synced to deployed copy → `web-numo-local` / `odoo19_local` / http://127.0.0.1:8169/. Verified with **Playwright (`channel:'chrome'`)** measuring `document.documentElement.scrollWidth - clientWidth` before reporting.
 
